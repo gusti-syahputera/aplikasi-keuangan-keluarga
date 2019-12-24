@@ -33,13 +33,3 @@ test:
     paths:
       - build
       - .gradle
-
-services:
-  - mariadb:latest
-
-variables:
-  # Configure mysql environment variables (https://hub.docker.com/_/mariadb)
-  MYSQL_DATABASE: "$MYSQL_DATABASE"
-  MYSQL_ROOT_PASSWORD: "$MYSQL_ROOT_PASSWORD"
-  MYSQL_USER: "$MYSQL_USER"
-  MYSQL_PASSWORD: "$MYSQL_PASSWORD"
