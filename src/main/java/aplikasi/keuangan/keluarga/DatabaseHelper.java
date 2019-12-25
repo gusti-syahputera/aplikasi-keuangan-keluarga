@@ -2,6 +2,7 @@ package aplikasi.keuangan.keluarga;
 
 import java.sql.*;
 
+
 public class DatabaseHelper {
 
 
@@ -9,6 +10,7 @@ public class DatabaseHelper {
 
     public DatabaseHelper(String db_filename) throws SQLException {
         this.db_filename = db_filename;
+        checkConnection();  // throws SQLException if failed
         initializeDb();
     }
 
@@ -25,8 +27,13 @@ public class DatabaseHelper {
         return "jdbc:sqlite:" + this.db_filename;
     }
 
+
     /* ==== Internal methods ================================================ */
 
+    private void checkConnection() throws SQLException {
+        DriverManager.getConnection(this.getURL());
+    }
+    
     private void initializeDb() {
 
         /* TODO: Improve this rather not elegant database initializer */
@@ -38,7 +45,7 @@ public class DatabaseHelper {
             "       full_name  TEXT    NOT NULL," +
             "       birth_date TEXT," +
             "       role       INTEGER DEFAULT 0," +  // Default: Role.ORDINARY
-            "       pass_key   TEXT" +
+            "       pass_key   TEXT    DEFAULT NULL" +
             ");",
 
             "CREATE TABLE IF NOT EXISTS account (" +
@@ -68,6 +75,7 @@ public class DatabaseHelper {
                 statement.execute(query);
                 statement.close();
             } catch (SQLException e) {
+                /* TODO: Use the logger */
                 e.printStackTrace();
             } finally {
                 try {
@@ -78,6 +86,9 @@ public class DatabaseHelper {
             }
         }
     }
+
+
+    /* ==== Public methods ================================================== */
 
     public Connection newConnection() {
         try {
