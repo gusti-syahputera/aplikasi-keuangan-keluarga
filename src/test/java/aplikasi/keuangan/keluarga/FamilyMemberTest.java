@@ -58,7 +58,7 @@ public class FamilyMemberTest {
          * started to fill the member data updating form. */
         String new_full_name = "Number Two";
         LocalDate new_birth_date = LocalDate.of(2001, 12,31);
-        FamilyMember.Role new_role = FamilyMember.Role.ACCOUNTANT;
+        FamilyMember.Role new_role = FamilyMember.Role.ORDINARY;
         new_member.setFullName(new_full_name);
         new_member.setBirthDate(new_birth_date);
         new_member.setRole(new_role);
@@ -91,7 +91,6 @@ public class FamilyMemberTest {
         /* Any user want to know specific family member's data.*/
         int member_id = 1;
 
-
         FamilyMember loaded_member = null;
         try {
             loaded_member = new FamilyMember(member_id);
@@ -100,6 +99,41 @@ public class FamilyMemberTest {
         }
 
         Assert.assertEquals(member_id, loaded_member.getId());
+    }
+
+    @Test
+    public void testRemoveMember() {
+        /* Chief family want to remove specific family member. */
+
+        /* Preparation */
+        String full_name = "Trash Member";
+        LocalDate birth_date = LocalDate.of(2000, 12,31);
+        FamilyMember.Role role = FamilyMember.Role.ORDINARY;
+        FamilyMember new_member = null;
+        try {
+            new_member = FamilyMember.newMember(full_name, birth_date, role);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        /* User click the "Remove member" button */
+        int member_id = new_member.getId();
+        FamilyMember loaded_member = null;
+        try {
+            FamilyMember.removeMember(member_id);
+        } catch (SQLException e) {
+            e.printStackTrace();
+            Assert.fail(e.getMessage());
+        }
+
+        FamilyMember removed_member = null;
+        try {
+            removed_member = new FamilyMember(member_id);
+        } catch (SQLException e) {
+            //success
+        }
+
+        Assert.assertNull(removed_member);
     }
 
 }

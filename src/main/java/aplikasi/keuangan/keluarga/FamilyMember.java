@@ -6,6 +6,7 @@ import java.time.Period;
 
 public class FamilyMember {
 
+
     public enum Role {ORDINARY, ACCOUNTANT, CHIEF}
 
 
@@ -160,7 +161,27 @@ public class FamilyMember {
         statement.executeUpdate();  // may throw SQLException
     }
 
-    /* TODO: Delete */
+
+    /* Delete */
+
+    /**
+     * Remove specific member from database.
+     */
+    public static void removeMember(int member_id) throws SQLException {
+        /* Create statement template */
+        Connection db_connection = AplikasiKeuanganKeluarga.getDatabaseConnection();
+        String query;
+        query  = "DELETE FROM member";
+        query += "      WHERE member_id = ?";  // 1
+        PreparedStatement statement = db_connection.prepareStatement(query);
+
+        /* Fill statement template */
+        statement.setInt(1, member_id);
+
+        /* Execute query */
+        statement.executeUpdate();  // may throw SQLException
+    }
+
 }
 
 /*
