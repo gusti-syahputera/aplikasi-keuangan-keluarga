@@ -41,11 +41,10 @@ public class FamilyMemberTest {
 
     @Test
     public void testUpdateMember() {
-        /* Add new member */
+        /* The family chief add a new family member. */
         String full_name = "Second Kid";
         LocalDate birth_date = LocalDate.of(2000, 12,31);
-        FamilyMember.Role role = FamilyMember.Role.ORDINARY;
-
+        FamilyMember.Role role = FamilyMember.Role.ACCOUNTANT;
         FamilyMember new_member = null;
         try {
             new_member = FamilyMember.newMember(full_name, birth_date, role);
@@ -54,24 +53,53 @@ public class FamilyMemberTest {
             Assert.fail(e.getMessage());
         }
 
-        /* Update member data */
-        String new_full_name = "The Wife";
-        LocalDate new_birth_date = LocalDate.of(1990, 12,31);
+        /* But then they realized that there were mistakes on the
+         * new kid data. Therefore they want to change it and
+         * started to fill the member data updating form. */
+        String new_full_name = "Number Two";
+        LocalDate new_birth_date = LocalDate.of(2001, 12,31);
         FamilyMember.Role new_role = FamilyMember.Role.ACCOUNTANT;
+        new_member.setFullName(new_full_name);
+        new_member.setBirthDate(new_birth_date);
+        new_member.setRole(new_role);
 
+        /* Then they click the "Save" button in the form. */
         try {
-            new_member.setFullName(new_full_name);
-            new_member.setBirthDate(new_birth_date);
-            new_member.setRole(new_role);
+            new_member.pushData();
         } catch (SQLException e) {
             e.printStackTrace();
             Assert.fail(e.getMessage());
+            /* When the pushing is failed, undo the changes */
+            try {
+                new_member.pullData();
+            } catch (SQLException ex) {
+                ex.printStackTrace();
+            }
         }
 
+        /* Finally they are happy because the data represent their
+         * kid's actual data. */
         Assert.assertEquals(new_full_name, new_member.getFullName());
         Assert.assertEquals(new_birth_date, new_member.getBirthDate());
         Assert.assertEquals(new_role, new_member.getRole());
-        Assert.assertEquals(Period.between(new_birth_date, LocalDate.now()).getYears(), new_member.getAge());
+        int new_age = Period.between(new_birth_date, LocalDate.now()).getYears();
+        Assert.assertEquals(new_age, new_member.getAge());
+    }
+
+    @Test
+    public void testLoadMember() {
+        /* Any user want to know specific family member's data.*/
+        int member_id = 1;
+
+
+        FamilyMember loaded_member = null;
+        try {
+            loaded_member = FamilyMember.loadMember(member_id);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        Assert.assertEquals(member_id, loaded_member.getId());
     }
 
 }

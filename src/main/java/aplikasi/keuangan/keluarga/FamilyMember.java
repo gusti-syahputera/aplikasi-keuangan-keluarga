@@ -8,9 +8,8 @@ import java.util.Calendar;
 
 public class FamilyMember {
 
-    public enum Role {
-        ORDINARY, ACCOUNTANT, CHIEF;
-    }
+
+    public enum Role {ORDINARY, ACCOUNTANT, CHIEF}
 
     /* ==== Constructors ==================================================== */
 
@@ -56,10 +55,14 @@ public class FamilyMember {
     public static FamilyMember newMember(String full_name,
                                          LocalDate birth_date,
                                          Role role) throws SQLException {
+        /* Create statement template */
         Connection db_connection = AplikasiKeuanganKeluarga.getDatabaseConnection();
-        PreparedStatement statement = db_connection.prepareStatement(
-                "INSERT INTO member VALUES (NULL, ?, ?, ?)"
-        );
+        String query;
+        query  = "INSERT INTO member";
+        query += "     VALUES (NULL, ?, ?, ?)";
+        PreparedStatement statement = db_connection.prepareStatement(query);
+
+        /* Fill statement template */
         statement.setString(1, full_name);
         statement.setString(2, birth_date.toString());  // see note [SQLDATE]
         statement.setInt(3, role.ordinal());
@@ -72,61 +75,95 @@ public class FamilyMember {
         return new FamilyMember(member_id, full_name, birth_date, role);
     }
 
+
     /* Read */
 
-    private void reloadData() throws SQLException {
-        /* Execute query into database*/
+    /**
+     * Load a member from database.
+     */
+    public static FamilyMember loadMember(int member_id) throws SQLException {
+        /* Construct a "member prototype" */
+        FamilyMember buffer = new FamilyMember(member_id, null, null, null);
+
+        /* Pull member data from database */
+        buffer.pullData();
+
+        return buffer;
+    }
+
+    /**
+     * Pull member data from database.
+     */
+    public void pullData() throws SQLException {
+        /* Create statement template */
         Connection db_connection = AplikasiKeuanganKeluarga.getDatabaseConnection();
-        String query = (
-                "SELECT full_name, birth_date, role " +
-                        "FROM member WHERE member_id = ?"
-        );
+        String query;
+        query  = "SELECT full_name,";
+        query += "       birth_date,";
+        query += "       role";
+        query += "  FROM member";
+        query += " WHERE member_id = ?";  // 1
         PreparedStatement statement = db_connection.prepareStatement(query);
-        statement.setInt(1, member_id);
+
+        /* Fill statement template */
+        statement.setInt(1, this.member_id);
+
+        /* Execute select query */
         ResultSet rs = statement.executeQuery();
+
+        /* Parse the result set and update member properties */
         this.full_name = rs.getString(1);
         this.birth_date = LocalDate.parse(rs.getString(2));
         this.role = Role.values()[rs.getInt(3)];
-
-        /* Parse result set and update member properties */
-
     }
+
 
     /* Updates */
 
-    private PreparedStatement getUpdateStatement(String column_name) throws SQLException {
-        /* TODO: Check if user is priviledged to doing this action */
-
-        /* Prepare update statement */
+    /**
+     * Push member data to the database.
+     *
+     * This method will be invoked when user click "Save" button in
+     * member data update form.
+     */
+    public void pushData() throws SQLException {
+        /* Create statement template */
         Connection db_connection = AplikasiKeuanganKeluarga.getDatabaseConnection();
-        String query = String.format(
-                "UPDATE member SET %s = ? WHERE member_id = ?", column_name);
+        String query;
+        query  = "UPDATE member";
+        query += "    SET full_name = ?,";   // 1
+        query += "        birth_date = ?,";  // 2
+        query += "        role = ?";         // 3
+        query += "  WHERE member_id = ?";    // 4
         PreparedStatement statement = db_connection.prepareStatement(query);
-        statement.setInt(2, this.member_id);
 
-        return statement;
+        /* Fill statement template */
+        statement.setString(1, this.full_name);
+        statement.setString(2, this.birth_date.toString());  // see note [SQLDATE]
+        statement.setInt(3, this.role.ordinal());
+        statement.setInt(4, this.member_id);
+
+        /* Execute query */
+        statement.executeUpdate();  // may throw SQLException
     }
 
-    public void setFullName(String new_full_name) throws SQLException {
-        PreparedStatement statement = this.getUpdateStatement("full_name");
-        statement.setString(1, new_full_name);
-        statement.executeUpdate();
-        this.reloadData();
+    public void setFullName(String full_name) {
+        this.full_name = full_name;
     }
 
-    public void setBirthDate(LocalDate new_birth_date) throws SQLException {
-        PreparedStatement statement = this.getUpdateStatement("birth_date");
-        statement.setString(1, new_birth_date.toString());  // see note [SQLDATE]
-        statement.executeUpdate();
-        this.reloadData();
+    public void setBirthDate(LocalDate birth_date) {
+        this.birth_date = birth_date;
     }
 
-    public void setRole(Role new_role) throws SQLException {
-        PreparedStatement statement = this.getUpdateStatement("role");
-        statement.setInt(1, new_role.ordinal());
-        statement.executeUpdate();
-        this.reloadData();
+    public void setRole(Role role) {
+        this.role = role;
     }
+
+    public void setRole(int role_number) {
+        this.role = Role.values()[role_number];
+    }
+
+
 
 }
 
