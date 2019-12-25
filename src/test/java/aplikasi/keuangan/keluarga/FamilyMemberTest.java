@@ -94,7 +94,7 @@ public class FamilyMemberTest {
 
         FamilyMember loaded_member = null;
         try {
-            loaded_member = FamilyMember.loadMember(member_id);
+            loaded_member = new FamilyMember(member_id);
         } catch (SQLException e) {
             e.printStackTrace();
         }

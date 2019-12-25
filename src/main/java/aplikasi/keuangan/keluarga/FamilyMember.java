@@ -1,24 +1,27 @@
 package aplikasi.keuangan.keluarga;
 
 import java.sql.*;
-import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.Period;
-import java.util.Calendar;
 
 public class FamilyMember {
 
-
     public enum Role {ORDINARY, ACCOUNTANT, CHIEF}
 
-    /* ==== Constructors ==================================================== */
 
-    public FamilyMember(int member_id, String full_name,
-                        LocalDate birth_date, Role role) {
+    /* ==== Constructor ===================================================== */
+
+    /**
+     * Construct member model.
+     *
+     * The particular member is assumed as already exists in the
+     * database.
+     */
+    public FamilyMember(int member_id) throws SQLException {
         this.member_id = member_id;
-        this.full_name = full_name;
-        this.birth_date = birth_date;
-        this.role = role;
+
+        /* Pull member data from database */
+        this.pullData();
     }
 
     /* ==== Properties ====================================================== */
@@ -48,10 +51,33 @@ public class FamilyMember {
         return Period.between(this.birth_date, LocalDate.now()).getYears();
     }
 
-    /* ==== CRUD methods ==================================================== */
+    public void setFullName(String full_name) {
+        this.full_name = full_name;
+    }
+
+    public void setBirthDate(LocalDate birth_date) {
+        this.birth_date = birth_date;
+    }
+
+    public void setRole(Role role) {
+        this.role = role;
+    }
+
+    public void setRole(int role_number) {
+        this.role = Role.values()[role_number];
+    }
+
+
+    /* ==== Database CRUD methods =========================================== */
 
     /* Create */
 
+    /**
+     * Create new member.
+     *
+     * This static method adds a new member into the database.
+     * Then it returns the new member model.
+     */
     public static FamilyMember newMember(String full_name,
                                          LocalDate birth_date,
                                          Role role) throws SQLException {
@@ -72,24 +98,11 @@ public class FamilyMember {
         ResultSet rs = statement.getGeneratedKeys();
         int member_id = rs.getInt(1);
 
-        return new FamilyMember(member_id, full_name, birth_date, role);
+        return new FamilyMember(member_id);
     }
 
 
     /* Read */
-
-    /**
-     * Load a member from database.
-     */
-    public static FamilyMember loadMember(int member_id) throws SQLException {
-        /* Construct a "member prototype" */
-        FamilyMember buffer = new FamilyMember(member_id, null, null, null);
-
-        /* Pull member data from database */
-        buffer.pullData();
-
-        return buffer;
-    }
 
     /**
      * Pull member data from database.
@@ -111,14 +124,14 @@ public class FamilyMember {
         /* Execute select query */
         ResultSet rs = statement.executeQuery();
 
-        /* Parse the result set and update member properties */
+        /* Parse the result set and update self properties */
         this.full_name = rs.getString(1);
         this.birth_date = LocalDate.parse(rs.getString(2));
         this.role = Role.values()[rs.getInt(3)];
     }
 
 
-    /* Updates */
+    /* Update */
 
     /**
      * Push member data to the database.
@@ -147,24 +160,7 @@ public class FamilyMember {
         statement.executeUpdate();  // may throw SQLException
     }
 
-    public void setFullName(String full_name) {
-        this.full_name = full_name;
-    }
-
-    public void setBirthDate(LocalDate birth_date) {
-        this.birth_date = birth_date;
-    }
-
-    public void setRole(Role role) {
-        this.role = role;
-    }
-
-    public void setRole(int role_number) {
-        this.role = Role.values()[role_number];
-    }
-
-
-
+    /* TODO: Delete */
 }
 
 /*
