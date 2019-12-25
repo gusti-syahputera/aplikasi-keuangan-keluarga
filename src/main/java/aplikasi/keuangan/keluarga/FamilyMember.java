@@ -82,8 +82,9 @@ public class FamilyMember {
     public static FamilyMember newMember(String full_name,
                                          LocalDate birth_date,
                                          Role role) throws SQLException {
+        Connection db_connection = AplikasiKeuanganKeluarga.getDbHelper().newConnection();
+
         /* Create statement template */
-        Connection db_connection = AplikasiKeuanganKeluarga.getDatabaseConnection();
         String query;
         query  = "INSERT INTO member";
         query += "     VALUES (NULL, ?, ?, ?)";
@@ -95,10 +96,12 @@ public class FamilyMember {
         statement.setInt(3, role.ordinal());
         statement.executeUpdate();
 
-        /* Retreive the generated auto-incremented id value */
+        /* Retreive the generated auto incremented id value */
         ResultSet rs = statement.getGeneratedKeys();
         int member_id = rs.getInt(1);
 
+        statement.close();
+        db_connection.close();
         return new FamilyMember(member_id);
     }
 
@@ -110,7 +113,7 @@ public class FamilyMember {
      */
     public void pullData() throws SQLException {
         /* Create statement template */
-        Connection db_connection = AplikasiKeuanganKeluarga.getDatabaseConnection();
+        Connection db_connection = AplikasiKeuanganKeluarga.getDbHelper().newConnection();
         String query;
         query  = "SELECT full_name,";
         query += "       birth_date,";
@@ -129,6 +132,9 @@ public class FamilyMember {
         this.full_name = rs.getString(1);
         this.birth_date = LocalDate.parse(rs.getString(2));
         this.role = Role.values()[rs.getInt(3)];
+
+        statement.close();
+        db_connection.close();
     }
 
 
@@ -142,7 +148,7 @@ public class FamilyMember {
      */
     public void pushData() throws SQLException {
         /* Create statement template */
-        Connection db_connection = AplikasiKeuanganKeluarga.getDatabaseConnection();
+        Connection db_connection = AplikasiKeuanganKeluarga.getDbHelper().newConnection();
         String query;
         query  = "UPDATE member";
         query += "    SET full_name = ?,";   // 1
@@ -159,6 +165,9 @@ public class FamilyMember {
 
         /* Execute query */
         statement.executeUpdate();  // may throw SQLException
+
+        statement.close();
+        db_connection.close();
     }
 
 
@@ -169,7 +178,7 @@ public class FamilyMember {
      */
     public static void removeMember(int member_id) throws SQLException {
         /* Create statement template */
-        Connection db_connection = AplikasiKeuanganKeluarga.getDatabaseConnection();
+        Connection db_connection = AplikasiKeuanganKeluarga.getDbHelper().newConnection();
         String query;
         query  = "DELETE FROM member";
         query += "      WHERE member_id = ?";  // 1
@@ -180,6 +189,9 @@ public class FamilyMember {
 
         /* Execute query */
         statement.executeUpdate();  // may throw SQLException
+
+        statement.close();
+        db_connection.close();
     }
 
 }

@@ -10,7 +10,7 @@ import java.time.Period;
 
 public class FamilyMemberTest {
 
-    private DatabaseWrapper db_wrapper;
+    private DatabaseHelper db_wrapper;
 
     @Before
     public void initDatabaseWrapper() {

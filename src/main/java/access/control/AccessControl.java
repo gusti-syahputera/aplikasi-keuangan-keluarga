@@ -17,7 +17,7 @@ public class AccessControl {
      * Access control model for an authenticated user
      */
     public AccessControl(FamilyMember candidate, String password) throws AuthFailException {
-        Connection db_connection = AplikasiKeuanganKeluarga.getDatabaseConnection();
+        Connection db_connection = AplikasiKeuanganKeluarga.getDbHelper().newConnection();
 
         PreparedStatement statement;
         String pass_key;
@@ -56,4 +56,6 @@ public class AccessControl {
     public FamilyMember.Role getUserRole() {
         return this.identity.getRole();
     }
+
+    /* TODO: Add access controled methods */
 }
