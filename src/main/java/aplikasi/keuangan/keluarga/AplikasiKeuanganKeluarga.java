@@ -3,22 +3,27 @@ package aplikasi.keuangan.keluarga;
 import access.control.AccessControl;
 
 import java.sql.SQLException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class AplikasiKeuanganKeluarga {
     private static DatabaseHelper db_helper;
     private static AccessControl access_control;
+    private static Logger logger;
 
     public static void main(String[] args) {
-        System.out.println("Main program started.");
+        logger = Logger.getLogger(AplikasiKeuanganKeluarga.class.getName());
+
+        logger.log(Level.INFO, "Attempting to connect to the database...");
 
         String db_filename = args[0];
         try {
             db_helper = new DatabaseHelper(db_filename);
         } catch (SQLException e) {
-            System.out.println("Database connection attempt failed!");
+            logger.log(Level.SEVERE, "Database connection attempt failed!");
         }
 
-        System.out.println("Main program finished.");
+        logger.log(Level.FINE, "Main program finished.");
     }
 
     public static DatabaseHelper getDbHelper() {
@@ -27,6 +32,10 @@ public class AplikasiKeuanganKeluarga {
 
     public static AccessControl getAccessControl() {
         return access_control;
+    }
+
+    public static Logger getLogger() {
+        return logger;
     }
 
     public static void assignAccessControl(AccessControl ac) {
