@@ -103,7 +103,7 @@ public class FamilyMemberTest {
 
     @Test
     public void testRemoveMember() {
-        /* Chief family want to remove specific family member. */
+        /* Family chief want to remove specific family member. */
 
         /* Preparation */
         String full_name = "Trash Member";
@@ -118,7 +118,6 @@ public class FamilyMemberTest {
 
         /* User click the "Remove member" button */
         int member_id = new_member.getId();
-        FamilyMember loaded_member = null;
         try {
             FamilyMember.removeMember(member_id);
         } catch (SQLException e) {

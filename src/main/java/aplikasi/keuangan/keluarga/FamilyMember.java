@@ -165,7 +165,7 @@ public class FamilyMember {
     /* Delete */
 
     /**
-     * Remove specific member from database.
+     * Remove specific member from the database.
      */
     public static void removeMember(int member_id) throws SQLException {
         /* Create statement template */
@@ -183,6 +183,8 @@ public class FamilyMember {
     }
 
 }
+
+/* TODO: Fix SQLite connection mechanism */
 
 /*
  * Notes
