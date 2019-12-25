@@ -18,7 +18,8 @@ public class DatabaseWrapper {
             "       member_id  INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL," +
             "       full_name  TEXT    NOT NULL," +
             "       birth_date TEXT," +
-            "       role       INTEGER DEFAULT 0" +
+            "       role       INTEGER DEFAULT 0," +  // Default: Role.ORDINARY
+            "       pass_key   TEXT" +
             ");",
 
             "CREATE TABLE IF NOT EXISTS account (" +

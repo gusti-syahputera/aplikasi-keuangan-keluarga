@@ -1,11 +1,13 @@
 package aplikasi.keuangan.keluarga;
 
+import access.control.AccessControl;
+
 import java.sql.Connection;
 import java.sql.SQLException;
 
 public class AplikasiKeuanganKeluarga {
     private static DatabaseWrapper db_wrapper;
-    private static Connection db_connection;
+    private static AccessControl access_control;
 
     public static void main(String[] args) {
         System.out.println("Connecting to database...");
@@ -24,5 +26,13 @@ public class AplikasiKeuanganKeluarga {
 
     public static Connection getDatabaseConnection() {
         return db_wrapper.getConnection();
+    }
+
+    public static AccessControl getAccessControl() {
+        return access_control;
+    }
+
+    public static void assignAccessControl(AccessControl ac) {
+        access_control = ac;
     }
 }
