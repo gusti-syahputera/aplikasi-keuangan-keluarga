@@ -10,6 +10,42 @@ public class DatabaseWrapper {
     private Connection connection;
     private Statement statement;
 
+    private void initDatabase() throws SQLException {
+
+        String[] create_tables = {
+
+            "CREATE TABLE IF NOT EXISTS member (" +
+            "       member_id  INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL," +
+            "       full_name  TEXT    NOT NULL," +
+            "       birth_date TEXT," +
+            "       role       INTEGER DEFAULT 0" +
+            ");",
+
+            "CREATE TABLE IF NOT EXISTS account (" +
+            "       account_id   INTEGER PRIMARY KEY NOT NULL," +
+            "       account_name TEXT    NOT NULL," +
+            "       owner_id     INTEGER NOT NULL," +
+            "       balance      INTEGER NOT NULL," +
+            "       FOREIGN KEY (owner_id) REFERENCES member(member_id)" +
+            "         ON DELETE SET NULL" +
+            ");",
+
+            "CREATE TABLE IF NOT EXISTS transaction_ (" +
+            "       tx_id       INTEGER PRIMARY KEY NOT NULL," +
+            "       account_id  INTEGER NOT NULL," +
+            "       amount      INTEGER NOT NULL," +
+            "       date_       TEXT NOT NULL," +
+            "       description TEXT," +
+            "       FOREIGN KEY (account_id) REFERENCES account(account_id)" +
+            "         ON DELETE SET NULL" +
+            ");"
+        };
+
+        for (String query: create_tables) {
+            this.statement.execute(query);
+        }
+    }
+
     public DatabaseWrapper(String db_filename) throws SQLException {
 
         String url = "jdbc:sqlite:" + db_filename;
@@ -17,6 +53,7 @@ public class DatabaseWrapper {
         try {
             this.connection = DriverManager.getConnection(url);
             this.statement = connection.createStatement();
+            initDatabase();
         } catch (SQLException e) {
             e.printStackTrace();
             throw e;
