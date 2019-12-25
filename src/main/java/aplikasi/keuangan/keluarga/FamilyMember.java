@@ -3,6 +3,8 @@ package aplikasi.keuangan.keluarga;
 import java.sql.*;
 import java.time.LocalDate;
 import java.time.Period;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class FamilyMember {
 
@@ -18,7 +20,7 @@ public class FamilyMember {
      * The particular member is assumed as already exists in the
      * database.
      */
-    public FamilyMember(int member_id) throws SQLException {
+    public FamilyMember(int member_id) throws FamilyMemberException {
         this.member_id = member_id;
 
         /* Pull member data from database */
@@ -81,28 +83,43 @@ public class FamilyMember {
      */
     public static FamilyMember newMember(String full_name,
                                          LocalDate birth_date,
-                                         Role role) throws SQLException {
+                                         Role role) throws FamilyMemberException {
         Connection db_connection = AplikasiKeuanganKeluarga.getDbHelper().newConnection();
+        int member_id;
+        try {
+            /* Create statement template */
+            String query;
+            query  = "INSERT INTO member";
+            query += "     VALUES (NULL, ?, ?, ?, NULL)";
+            PreparedStatement statement = db_connection.prepareStatement(query);
 
-        /* Create statement template */
-        String query;
-        query  = "INSERT INTO member";
-        query += "     VALUES (NULL, ?, ?, ?)";
-        PreparedStatement statement = db_connection.prepareStatement(query);
+            /* Fill statement template */
+            statement.setString(1, full_name);
+            statement.setString(2, birth_date.toString());  // see note [SQLDATE]
+            statement.setInt(3, role.ordinal());
+            statement.executeUpdate();
 
-        /* Fill statement template */
-        statement.setString(1, full_name);
-        statement.setString(2, birth_date.toString());  // see note [SQLDATE]
-        statement.setInt(3, role.ordinal());
-        statement.executeUpdate();
+            /* Retreive the generated auto incremented id value */
+            ResultSet rs = statement.getGeneratedKeys();
+            member_id = rs.getInt(1);
 
-        /* Retreive the generated auto incremented id value */
-        ResultSet rs = statement.getGeneratedKeys();
-        int member_id = rs.getInt(1);
+            statement.close();
+        } catch (SQLException e) {
+            AplikasiKeuanganKeluarga.getLogger().log(Level.WARNING, e.getMessage());
+            throw new FamilyMemberException("Creating new member failed!");
+        } finally {
+            try {
+                db_connection.close();
+            } catch (SQLException e) {
+                AplikasiKeuanganKeluarga.getLogger().log(Level.WARNING, e.getMessage());
+            }
+        }
 
-        statement.close();
-        db_connection.close();
-        return new FamilyMember(member_id);
+        FamilyMember new_member = null;
+        try {
+            new_member = new FamilyMember(member_id);
+        } catch (FamilyMemberException ignored) {}
+        return  new_member;
     }
 
 
@@ -111,30 +128,47 @@ public class FamilyMember {
     /**
      * Pull member data from database.
      */
-    public void pullData() throws SQLException {
-        /* Create statement template */
+    public void pullData() throws FamilyMemberException {
         Connection db_connection = AplikasiKeuanganKeluarga.getDbHelper().newConnection();
-        String query;
-        query  = "SELECT full_name,";
-        query += "       birth_date,";
-        query += "       role";
-        query += "  FROM member";
-        query += " WHERE member_id = ?";  // 1
-        PreparedStatement statement = db_connection.prepareStatement(query);
+        try {
+            /* Create statement template */
+            String query;
+            query  = "SELECT full_name,";
+            query += "       birth_date,";
+            query += "       role";
+            query += "  FROM member";
+            query += " WHERE member_id = ?";  // 1
+            PreparedStatement statement = db_connection.prepareStatement(query);
 
-        /* Fill statement template */
-        statement.setInt(1, this.member_id);
+            /* Fill statement and execute */
+            statement.setInt(1, this.member_id);
+            ResultSet rs = statement.executeQuery();
 
-        /* Execute select query */
-        ResultSet rs = statement.executeQuery();
+            /* Check whether the member exists as indicated by the
+             * state of the result set.
+             */
+            if (rs.isClosed()) {
+                String message = String.format("Member with id: %d is not in the database.", member_id);
+                throw new FamilyMemberException(message);
+            }
 
-        /* Parse the result set and update self properties */
-        this.full_name = rs.getString(1);
-        this.birth_date = LocalDate.parse(rs.getString(2));
-        this.role = Role.values()[rs.getInt(3)];
+            /* Parse the result set and update self properties */
+            this.full_name = rs.getString(1);
+            this.birth_date = LocalDate.parse(rs.getString(2));
+            this.role = Role.values()[rs.getInt(3)];
 
-        statement.close();
-        db_connection.close();
+            statement.close();
+            /* TODO: Examine the exception behaviour. Which one to
+             * throw, SQLException or FamilyMemberException? */
+        } catch (SQLException e) {
+            AplikasiKeuanganKeluarga.getLogger().log(Level.WARNING, e.getMessage());
+        } finally {
+            try {
+                db_connection.close();
+            } catch (SQLException e) {
+                AplikasiKeuanganKeluarga.getLogger().log(Level.WARNING, e.getMessage());
+            }
+        }
     }
 
 
@@ -196,7 +230,7 @@ public class FamilyMember {
 
 }
 
-/* TODO: Fix SQLite connection mechanism */
+/* TODO: Refactor each methods exception behaviour. */
 
 /*
  * Notes

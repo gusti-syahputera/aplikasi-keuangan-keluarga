@@ -10,30 +10,32 @@ import java.time.Period;
 
 public class FamilyMemberTest {
 
-    private DatabaseHelper db_wrapper;
-
     @Before
-    public void initDatabaseWrapper() {
+    public void initDbHandler() {
         String[] args = {"test_aplikasi_keuangan_keluarga.db"};
         AplikasiKeuanganKeluarga.main(args);
     }
 
     @Test
     public void testNewMember() {
+        /* The family chief want to add a new family member. */
+
+        /* They fill the new member form */
         String full_name = "First Last";
         LocalDate birth_date = LocalDate.of(2000, 12,31);
         FamilyMember.Role role = FamilyMember.Role.CHIEF;
 
+        /* Then click the "Add" button */
         FamilyMember new_member = null;
         try {
             new_member = FamilyMember.newMember(full_name, birth_date, role);
-        } catch (SQLException e) {
-            e.printStackTrace();
+        } catch (FamilyMemberException e) {
+            e.getCause().printStackTrace();
             Assert.fail(e.getMessage());
         }
 
+        /* The new member successfully added to the database */
         Assert.assertTrue((new_member.getId() > 0));
-        System.out.println("new_member.id: " + new_member.getId());
         Assert.assertEquals(full_name, new_member.getFullName());
         Assert.assertEquals(birth_date, new_member.getBirthDate());
         Assert.assertEquals(Period.between(birth_date, LocalDate.now()).getYears(), new_member.getAge());
@@ -48,8 +50,8 @@ public class FamilyMemberTest {
         FamilyMember new_member = null;
         try {
             new_member = FamilyMember.newMember(full_name, birth_date, role);
-        } catch (SQLException e) {
-            e.printStackTrace();
+        } catch (FamilyMemberException e) {
+            e.getCause().printStackTrace();
             Assert.fail(e.getMessage());
         }
 
@@ -67,14 +69,16 @@ public class FamilyMemberTest {
         try {
             new_member.pushData();
         } catch (SQLException e) {
-            e.printStackTrace();
-            Assert.fail(e.getMessage());
-            /* When the pushing is failed, undo the changes */
+            /* Pushing was failed, hence undo the changes.
+             * NOTE: This behaviour have not tested yet. */
             try {
                 new_member.pullData();
-            } catch (SQLException ex) {
-                ex.printStackTrace();
+            } catch (FamilyMemberException ex) {
+                ex.getCause().printStackTrace();
             }
+            e.printStackTrace();
+            Assert.fail(e.getMessage());
+
         }
 
         /* Finally they are happy because the data represent their
@@ -89,15 +93,21 @@ public class FamilyMemberTest {
     @Test
     public void testLoadMember() {
         /* Any user want to know specific family member's data.*/
-        int member_id = 1;
 
+        /* Preparation */
+        String full_name = "Trash Member";
+        LocalDate birth_date = LocalDate.of(2000, 12,31);
+        FamilyMember.Role role = FamilyMember.Role.ORDINARY;
+        try {
+            FamilyMember.newMember(full_name, birth_date, role);
+        } catch (FamilyMemberException ignored) {}
+
+        /* Retreive specific member data from the database */
+        int member_id = 1;
         FamilyMember loaded_member = null;
         try {
             loaded_member = new FamilyMember(member_id);
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-
+        } catch (FamilyMemberException ignored) {}
         Assert.assertEquals(member_id, loaded_member.getId());
     }
 
@@ -112,9 +122,7 @@ public class FamilyMemberTest {
         FamilyMember new_member = null;
         try {
             new_member = FamilyMember.newMember(full_name, birth_date, role);
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+        } catch (FamilyMemberException ignored) {}
 
         /* User click the "Remove member" button */
         int member_id = new_member.getId();
@@ -125,14 +133,12 @@ public class FamilyMemberTest {
             Assert.fail(e.getMessage());
         }
 
-        FamilyMember removed_member = null;
+        /* Finally the particular family member does not longer exist
+         * in the database. */
         try {
-            removed_member = new FamilyMember(member_id);
-        } catch (SQLException e) {
-            //success
-        }
-
-        Assert.assertNull(removed_member);
+            new FamilyMember(member_id);
+            Assert.fail("FamilyMemberException was not thrown.");
+        } catch (FamilyMemberException expected) {}
     }
 
 }
