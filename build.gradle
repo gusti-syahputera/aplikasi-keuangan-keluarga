@@ -16,4 +16,7 @@ dependencies {
     
     // SQLite driver
     implementation group: 'org.xerial', name: 'sqlite-jdbc', version: '3.30.1'
+    
+    // Norm
+    implementation group: 'com.dieselpoint', name: 'norm', version: '0.8.6'
 }
