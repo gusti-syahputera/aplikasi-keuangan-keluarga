@@ -29,7 +29,7 @@ test:
   script:
     - gradle test
     - ./gradlew build jacocoTestReport
-    - cat build/reports/jacoco/report/html/index.html | grep -o '<tfoot>.*</tfoot>'
+    - cat build/reports/jacoco/test/html/index.html | grep -o '<tfoot>.*</tfoot>'
   cache:
     key: "$CI_COMMIT_REF_NAME"
     policy: pull
@@ -38,6 +38,6 @@ test:
       - .gradle
   artifacts:
     paths:
-      - build/reports/jacoco/report/html/index.html
+      - build/reports/jacoco/test/html/index.html
     expire_in: 10 mins
     
