@@ -71,28 +71,6 @@ public class FamilyMemberTest {
     }
     //endregion
 
-
-    @Test
-    public void givenNewBiodata_whenUpdateNewFamilyMember() {
-
-        /* Given */
-        String fullName = "Candy Bar";
-        LocalDate birthDate = LocalDate.of(1999,12,30);
-        Role role = Role.ACCOUNTANT;
-        String password = "SpamSpamSpam Egg";
-
-        /* When */
-        familyMember.setFullName(fullName);
-        familyMember.setBirthDate(birthDate);
-        familyMember.setRole(role);
-        familyMember.setPassword(password);
-
-        /* Then */
-        Assert.assertEquals(fullName, familyMember.getFullName());
-        Assert.assertEquals(birthDate, familyMember.getBirthDate());
-        Assert.assertEquals(role, familyMember.getRole());
-    }
-
     @Test
     public void whenInsertToDatabase_thenGetGeneratedId() {
 
