@@ -1,17 +1,31 @@
 package com.apkeukel;
 
 import com.dieselpoint.norm.Database;
+import com.dieselpoint.norm.Query;
+import de.rtner.security.auth.spi.SimplePBKDF2;
 import org.junit.*;
+import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.runners.MockitoJUnitRunner;
 
 import java.time.LocalDate;
 import java.time.Period;
 
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.*;
 
+
+@RunWith(MockitoJUnitRunner.class)
 public class FamilyMemberTest {
 
-    private static Database database;
-    private FamilyMember familyMember;
+    @Mock
+    private SimplePBKDF2 pbkdf2;
 
+    @InjectMocks
+    private FamilyMember familyMember = new FamilyMember();
+
+    private static Database database;
 
     //region Setups
     //==========================================================================
@@ -30,27 +44,30 @@ public class FamilyMemberTest {
     }
 
     @Before
-    public void givenBiodata_whenCreateNewFamilyMember() {
+    public void setUp() {
+
+        /* Set up mocks */
+        when(pbkdf2.deriveKeyFormatted(anyString())).thenReturn("");
 
         /* Given */
         String fullName = "Foo Bar";
-        LocalDate birthDate = LocalDate.of(1999,12,31);
+        LocalDate birthDate = LocalDate.of(1999, 12, 31);
         Role role = Role.ORDINARY;
         String password = "Spam Egg";
 
         /* When */
-        familyMember = new FamilyMember(fullName, birthDate, role, password);
+        familyMember.setFullName(fullName);
+        familyMember.setBirthDate(birthDate);
+        familyMember.setRole(role);
+        familyMember.setPassword(password);
         int memberAge = Period.between(LocalDate.now(), familyMember.getBirthDate()).getYears();
 
         /* Then */
+        verify(pbkdf2).deriveKeyFormatted(anyString());
         Assert.assertEquals(fullName, familyMember.getFullName());
         Assert.assertEquals(birthDate, familyMember.getBirthDate());
         Assert.assertEquals(role, familyMember.getRole());
         Assert.assertEquals(memberAge, familyMember.getAge());
-
-        /* Verifying the key might be expensive */
-//        boolean isKeyVerified = new SimplePBKDF2().verifyKeyFormatted(familyMember.getPassKey(), password);
-//        Assert.assertTrue(isKeyVerified);
     }
     //endregion
 
@@ -74,16 +91,12 @@ public class FamilyMemberTest {
         Assert.assertEquals(fullName, familyMember.getFullName());
         Assert.assertEquals(birthDate, familyMember.getBirthDate());
         Assert.assertEquals(role, familyMember.getRole());
-
-        /* Verifying the key might be expensive */
-//        boolean isKeyVerified = new SimplePBKDF2().verifyKeyFormatted(familyMember.getPassKey(), password);
-//        Assert.assertTrue(isKeyVerified);
     }
 
     @Test
-    public void givenFamilyMember_whenInsertToDatabase_thenGetGeneratedId() {
+    public void whenInsertToDatabase_thenGetGeneratedId() {
 
-        /* Given & when */
+        /* When */
         database.insert(familyMember);
 
         /* Then */
@@ -94,22 +107,24 @@ public class FamilyMemberTest {
     public void givenUpdatedFamilyMember_whenUpdateToDatabase() {
 
         /* Given */
+        database.insert(familyMember);
+
         String fullName = "Candy Bar";
         LocalDate birthDate = LocalDate.of(1999,12,30);
         Role role = Role.ACCOUNTANT;
         String password = "SpamSpamSpam Egg";
+
         familyMember.setFullName(fullName);
         familyMember.setBirthDate(birthDate);
         familyMember.setRole(role);
         familyMember.setPassword(password);
-        database.insert(familyMember);
 
         /* When */
         database.update(familyMember);
     }
 
     @Test
-    public void givenFamilyMember_whenDeleteInDatabase() {
+    public void whenDeleteFromDatabase() {
 
         /* Given */
         database.insert(familyMember);
@@ -122,14 +137,15 @@ public class FamilyMemberTest {
     }
 
     @Test
-    public void givenMemberId_whenReadFromDatabase() {
+    public void givenMemberId_whenLoadFromDatabase_thenRetreiveSameMember() {
 
         /* Given */
         database.insert(familyMember);
         int memberId = familyMember.getId();
 
         /* When */
-        FamilyMember retreivedMember = database.where("member_id = ?", memberId).first(FamilyMember.class);
+        Query query = database.where("member_id=?", memberId);
+        FamilyMember retreivedMember = query.first(FamilyMember.class);
 
         /* Then */
         Assert.assertEquals(familyMember, retreivedMember);

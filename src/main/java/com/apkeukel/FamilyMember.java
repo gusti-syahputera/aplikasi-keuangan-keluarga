@@ -1,5 +1,6 @@
 package com.apkeukel;
 
+import com.google.inject.Inject;
 import de.rtner.security.auth.spi.SimplePBKDF2;
 
 import javax.persistence.*;
@@ -28,14 +29,7 @@ public class FamilyMember implements Serializable {
     /**
      * No-arg constructor used by Norm.
      */
-    @Deprecated
-    public FamilyMember() {
-        this.memberId = 0;
-        this.fullName = "";
-        this.birthDate = LocalDate.ofEpochDay(0);
-        this.role = Role.ORDINARY;
-        this.passKey = "";
-    }
+    public FamilyMember() {}
 
     /**
      * General family member constructor.
@@ -71,6 +65,9 @@ public class FamilyMember implements Serializable {
 
     //region Properties
     //==========================================================================
+
+    @Inject
+    private SimplePBKDF2 pbkdf2;
 
     private int memberId;
     private String fullName;
@@ -145,7 +142,7 @@ public class FamilyMember implements Serializable {
 
     @Transient
     public void setPassword(String password) {
-        this.passKey = new SimplePBKDF2().deriveKeyFormatted(password);
+        this.passKey = pbkdf2.deriveKeyFormatted(password);
     }
     //endregion
 
