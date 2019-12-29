@@ -26,7 +26,10 @@ build:
 
 test:
   stage: test
-  script: gradle check
+  script:
+    - gradle test
+    - ./gradlew build jacocoTestReport
+    - cat build/reports/jacoco/report/html/index.html | grep -o '<tfoot>.*</tfoot>'
   cache:
     key: "$CI_COMMIT_REF_NAME"
     policy: pull
