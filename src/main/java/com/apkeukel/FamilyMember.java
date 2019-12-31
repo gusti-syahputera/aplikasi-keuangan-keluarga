@@ -23,46 +23,6 @@ public class FamilyMember implements Serializable {
             ");";
 
 
-    //region Constructors
-    //==========================================================================
-
-    /**
-     * No-arg constructor used by Norm.
-     */
-    public FamilyMember() {}
-
-    /**
-     * General family member constructor.
-     */
-    public FamilyMember(String fullName, LocalDate birthDate, Role role, String password) {
-        this.fullName = fullName;
-        this.birthDate = birthDate;
-        this.role = role;
-        this.setPassword(password);
-    }
-    //endregion
-
-
-    //region Comparations
-    //==========================================================================
-
-    @Override
-    public boolean equals(Object comparate_) {
-        if (comparate_ != null || comparate_ instanceof FamilyMember) {
-            FamilyMember comparate = (FamilyMember) comparate_;
-            return this.hashCode() == comparate.hashCode();
-        }
-        return false;
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(this.memberId, this.fullName,
-                this.birthDate, this.role, this.passKey);
-    }
-    //endregion
-
-
     //region Properties
     //==========================================================================
 
@@ -74,6 +34,15 @@ public class FamilyMember implements Serializable {
     private LocalDate birthDate;
     private Role role;
     private String passKey;
+
+    @Transient
+    public void setBiodata(String fullName, LocalDate birthDate,
+                           Role role, String password) {
+        this.fullName = fullName;
+        this.birthDate = birthDate;
+        this.role = role;
+        this.setPassword(password);
+    }
 
     @Id
     @GeneratedValue
@@ -146,11 +115,40 @@ public class FamilyMember implements Serializable {
     }
     //endregion
 
+
+    //region Comparations
+    //==========================================================================
+
+    @Override
+    public boolean equals(Object comparate_) {
+
+        if (this == comparate_) {
+            return true;
+        }
+        if (comparate_ == null) {
+            return false;
+        }
+        if (this.getClass() != comparate_.getClass()) {
+            return false;
+        }
+        FamilyMember comparate = (FamilyMember) comparate_;
+        return this.hashCode() == comparate.hashCode();
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(this.memberId, this.fullName,
+                this.birthDate, this.role, this.passKey);
+    }
+    //endregion
+
 }
 
 
 /*
  * Notes
+ *
+ * TODO: Add Javadoc for all public field and methods
  *
  * [DATENORM] Norm loads date to pojo as String instead of LocalDate.
  * One trick for this situation is to make a pair of setter and getter

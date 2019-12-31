@@ -25,7 +25,11 @@ public class FamilyMemberTest {
     @InjectMocks
     private FamilyMember familyMember = new FamilyMember();
 
+    @InjectMocks
+    private FamilyMember blankFamilyMember = new FamilyMember();
+
     private static Database database;
+
 
     //region Setups
     //==========================================================================
@@ -63,13 +67,75 @@ public class FamilyMemberTest {
         int memberAge = Period.between(LocalDate.now(), familyMember.getBirthDate()).getYears();
 
         /* Then */
-        verify(pbkdf2).deriveKeyFormatted(anyString());
         Assert.assertEquals(fullName, familyMember.getFullName());
         Assert.assertEquals(birthDate, familyMember.getBirthDate());
         Assert.assertEquals(role, familyMember.getRole());
         Assert.assertEquals(memberAge, familyMember.getAge());
+        verify(pbkdf2).deriveKeyFormatted(anyString());
     }
     //endregion
+
+
+    //region Comparations
+    //==========================================================================
+    @Test
+    public void givenSelf_whenIsEquals_thenTrue() {
+        Assert.assertEquals(familyMember, familyMember);
+    }
+
+    @Test
+    public void givenNull_whenIsEquals_thenFalse() {
+        /* assertFalse is used instead assertNotEquals to make
+         * sure that the equals method of the FamilyMember instance
+         * is invoked (not the comparate's). */
+        Assert.assertFalse(familyMember.equals(null));
+    }
+
+    @Test
+    public void givenStrangeObject_whenIsEquals_thenFalse() {
+        /* assertFalse is used instead assertNotEquals to make
+         * sure that the equals method of the FamilyMember instance
+         * is invoked (not the comparate's). */
+        Assert.assertFalse(familyMember.equals(""));
+    }
+
+    @Test
+    public void givenOutdatedFamilyMember_whenIsEquals_thenFalse() {
+
+        /* Given an instance with same ID but has different data */
+        blankFamilyMember.setId(familyMember.getId());
+
+        /* assertFalse is used instead assertNotEquals to make
+         * sure that the equals method of the FamilyMember instance
+         * is is invoked (not the comparate's). */
+        Assert.assertFalse(blankFamilyMember.equals(familyMember));
+    }
+    //endregion
+
+
+    @Test
+    public void givenCreatedFamilyMember_whenSetBiodata() {
+
+        /* Given blankFamilyMember, which is already initialized and
+         * injected but have not get its properties populated. */
+
+        /* When */
+        String fullName = "Foo Bar";
+        LocalDate birthDate = LocalDate.of(1999, 12, 31);
+        Role role = Role.ORDINARY;
+        String password = "Spam Egg2";
+
+        blankFamilyMember.setBiodata(fullName, birthDate, role, password);
+        int memberAge = Period.between(LocalDate.now(), blankFamilyMember.getBirthDate()).getYears();
+
+        /* Then */
+        Assert.assertEquals(fullName, blankFamilyMember.getFullName());
+        Assert.assertEquals(birthDate, blankFamilyMember.getBirthDate());
+        Assert.assertEquals(role, blankFamilyMember.getRole());
+        Assert.assertEquals(memberAge, blankFamilyMember.getAge());
+        verify(pbkdf2, times(2))  // note that the mock is also used by setUp's familyMember
+                .deriveKeyFormatted(anyString());         // therefore 2 invocations is expected
+    }
 
     @Test
     public void whenInsertToDatabase_thenGetGeneratedId() {
