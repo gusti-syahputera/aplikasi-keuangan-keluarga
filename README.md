@@ -4,7 +4,7 @@
 
 A simple family finance management application project that I develop as the assignment for my "GUI Programming" class final project.
 
-In this project, I try to learn and use certain frameworks, tools, design patterns and best practices in software development.
+In this project, I try to learn and use various frameworks, tools, design patterns and best practices in software development.
 
 ## Methodology
 I use [test-driven development (TDD)](https://en.wikipedia.org/wiki/Test-driven_development) technique to develop the software.
@@ -14,8 +14,8 @@ I use [test-driven development (TDD)](https://en.wikipedia.org/wiki/Test-driven_
 *  Build tool: Gradle
 *  Unit test framework: JUnit 4.12
 *  Mock framework: Mockito 1.+
-*  Dependency injection framework: Guice 4.2
-*  Database: SQLite
+*  Dependency injection framework: Guice 4.2.2
+*  Database: SQLite 3.30.1
 *  Micro-ORM framework: Norm 0.8.6
 
 ## Project status
