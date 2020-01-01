@@ -79,4 +79,16 @@ public class TransactionTest {
         Assert.assertEquals(date, testTransaction.getDate());
         Assert.assertEquals(description, testTransaction.getDescription());
     }
+
+    @Test
+    public void whenSetAccount() {
+
+        int accountId = mockAccount.getId();
+
+        /* When */
+        testTransaction.setAccount(mockAccount);
+
+        /* Then */
+        Assert.assertEquals(accountId, testTransaction.getAccountId());
+    }
 }

@@ -79,6 +79,10 @@ public class Transaction implements Serializable {
     public void setDescription(String description) {
         this.description = description;
     }
+
+    public void setAccount(Account account) {
+        this.accountId = account.getId();
+    }
     //endregion
 
 }
