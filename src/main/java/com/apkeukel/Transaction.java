@@ -1,9 +1,6 @@
 package com.apkeukel;
 
-import javax.persistence.Column;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.Objects;
@@ -71,7 +68,13 @@ public class Transaction implements Serializable {
         return this.amount;
     }
 
+    @Deprecated  // see [DATENORM]
     @Column(name="date_")
+    public String getDate_() {
+        return this.date.toString();
+    }
+
+    @Transient
     public LocalDate getDate() {
         return this.date;
     }
@@ -93,6 +96,11 @@ public class Transaction implements Serializable {
         this.amount = amount;
     }
 
+    @Deprecated  // see [DATENORM]
+    public void setDate_(String date) {
+        this.date = LocalDate.parse(date);
+    }
+
     public void setDate(LocalDate date) {
         this.date = date;
     }
@@ -104,6 +112,15 @@ public class Transaction implements Serializable {
     public void setAccount(Account account) {
         this.accountId = account.getId();
     }
+
+    /*
+     * Notes
+     *
+     * [DATENORM] Norm loads date to pojo as String instead of LocalDate.
+     * One trick for this situation is to make a pair of setter and getter
+     * for a dummy property `birthDate_` which attached to the date
+     * column in the database table.
+     */
     //endregion
 
 

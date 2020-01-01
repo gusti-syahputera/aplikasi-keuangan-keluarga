@@ -1,6 +1,7 @@
 package com.apkeukel;
 
 import com.dieselpoint.norm.Database;
+import com.dieselpoint.norm.Query;
 import org.junit.*;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
@@ -9,6 +10,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 import java.time.LocalDate;
 
 import static org.mockito.Mockito.when;
+
 
 @RunWith(MockitoJUnitRunner.class)
 public class TransactionTest {
@@ -157,6 +159,49 @@ public class TransactionTest {
      * Assert do not invoke the equals() which is the object of
      * test.
      */
+    //endregion
+
+
+    //region Persistency tests
+    //==========================================================================
+
+    @Test
+    public void whenInsertToDatabase_thenGetGeneratedId() {
+
+        /* When */
+        database.insert(testTransaction);
+
+        /* Then */
+        Assert.assertNotEquals(0, testTransaction.getId());
+    }
+
+    @Test
+    public void whenLoadFromDatabase() {
+
+        /* Given */
+        database.insert(testTransaction);
+        int transactionId = testTransaction.getId();
+
+        /* When */
+        Query query = database.table("transaction_").where("tx_id=?", transactionId);
+        Transaction retreivedAccount = query.first(Transaction.class);
+
+        /* Then */
+        Assert.assertEquals(testTransaction, retreivedAccount);
+    }
+
+    @Test
+    public void whenDeleteInDatabase() {
+
+        /* Given */
+        database.insert(testTransaction);
+
+        /* When */
+        int affectedRow = database.delete(testTransaction).getRowsAffected();
+
+        /* Then */
+        Assert.assertEquals(1, affectedRow);
+    }
     //endregion
 
 }
