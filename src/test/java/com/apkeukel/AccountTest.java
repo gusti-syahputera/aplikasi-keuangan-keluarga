@@ -54,6 +54,65 @@ public class AccountTest {
     }
     //endregion
 
+
+    //region Comparations
+    //==========================================================================
+    @Test
+    public void givenSelf_whenIsEquals_thenTrue() {
+        Assert.assertTrue(testAccount.equals(testAccount));  // see [ASSERTEQUALS]
+    }
+
+    @Test
+    public void givenSameAccountButDifferentObjects_whenIsEquals_thenTrue() {
+        String accountName = "Test Account";
+        FamilyMember owner = familyMember;
+        int balance = 5000;
+
+        /* Given */
+        Account account1 = new Account(accountName, owner, balance);
+        account1.setId(1);
+        Account account2 = new Account(accountName, owner, balance);
+        account2.setId(1);
+
+        /* Then */
+        Assert.assertTrue(account1.equals(account2));  // see [ASSERTEQUALS]
+        Assert.assertTrue(account2.equals(account1));  // see [ASSERTEQUALS]
+    }
+
+    @Test
+    public void givenNull_whenIsEquals_thenFalse() {
+        Assert.assertFalse(testAccount.equals(null));  // see [ASSERTEQUALS]
+    }
+
+    @Test
+    public void givenStrangeObject_whenIsEquals_thenFalse() {
+        Assert.assertFalse(testAccount.equals(""));  // see [ASSERTEQUALS]
+    }
+
+    @Test
+    public void givenOutdatedAccount_whenIsEquals_thenFalse() {
+
+        /* Given an instance with same ID but has different data */
+        Account account1 = new Account("Test Account", 1, 5000);
+        account1.setId(1);
+        Account account2 = new Account("Test Account", 1, 4000);
+        account2.setId(1);
+
+        /* Then */
+        Assert.assertFalse(account1.equals(account2));  // see [ASSERTEQUALS]
+        Assert.assertFalse(account2.equals(account1));  // see [ASSERTEQUALS]
+    }
+
+    /* Notes
+     *
+     * [ASSERTEQUALS] Manual invocation of the equals() methods
+     * is used as the assertEquals() and assertNotEquals() from
+     * Assert do not invoke the equals() which is the object of
+     * test.
+     */
+    //endregion
+
+
     @Test
     public void whenCreateWithParameterConstructor() {
 

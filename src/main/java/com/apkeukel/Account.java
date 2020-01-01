@@ -2,6 +2,7 @@ package com.apkeukel;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.util.Objects;
 
 
 @Table(name="account")
@@ -84,7 +85,35 @@ public class Account implements Serializable {
     public void setBalance(int balance) {
         this.balance = balance;
     }
+    //endregion
 
+
+    //region Comparations
+    //==========================================================================
+
+    @Override
+    public boolean equals(Object comparate_) {
+
+        if (this == comparate_) {
+            return true;
+        }
+        if (comparate_ == null) {
+            return false;
+        }
+        if (this.getClass() != comparate_.getClass()) {
+            return false;
+        }
+        Account comparate = (Account) comparate_;
+        return this.hashCode() == comparate.hashCode();
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(
+                this.accountId, this.accountName,
+                this.ownerId, this.balance
+        );
+    }
     //endregion
 
 }
