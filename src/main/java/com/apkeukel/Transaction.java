@@ -25,6 +25,14 @@ public class Transaction implements Serializable {
     //==========================================================================
 
     public Transaction() {}
+
+    public Transaction(int accountId, double amount,
+                       LocalDate date, String description) {
+        this.setAccountId(accountId);
+        this.setAmount(amount);
+        this.setDate(date);
+        this.setDescription(description);
+    }
     //endregion
 
 

@@ -34,10 +34,8 @@ public class TransactionTest {
     public static void databaseTearDown() {
         database.close();
     }
-    //endregion
 
-
-    @Test
+    @Before
     public void whenCreateAndSetProperties() {
         when(mockAccount.getId()).thenReturn(1);
 
@@ -59,5 +57,26 @@ public class TransactionTest {
         Assert.assertEquals(date, testTransaction.getDate());
         Assert.assertEquals(description, testTransaction.getDescription());
     }
+    //endregion
 
+
+    @Test
+    public void whenCreateWithParameterConstructor() {
+        when(mockAccount.getId()).thenReturn(1);
+
+        /* Given */
+        int accountId = mockAccount.getId();
+        double amount = 500.0;
+        LocalDate date = LocalDate.now();
+        String description = "Initial income";
+
+        /* When */
+        testTransaction = new Transaction(accountId, amount, date, description);
+
+        /* Then */
+        Assert.assertEquals(accountId, testTransaction.getAccountId());
+        Assert.assertEquals(amount, testTransaction.getAmount(), 0.0);
+        Assert.assertEquals(date, testTransaction.getDate());
+        Assert.assertEquals(description, testTransaction.getDescription());
+    }
 }
