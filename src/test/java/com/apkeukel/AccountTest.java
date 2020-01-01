@@ -1,6 +1,7 @@
 package com.apkeukel;
 
 import com.dieselpoint.norm.Database;
+import com.dieselpoint.norm.Query;
 import org.junit.*;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
@@ -145,10 +146,39 @@ public class AccountTest {
 
     @Test
     public void whenInsertToDatabase_thenGetGeneratedId() {
+
         /* When */
         database.insert(testAccount);
 
         /* Then */
         Assert.assertNotEquals(0, testAccount.getId());
+    }
+
+    @Test
+    public void whenLoadFromDatabase() {
+
+        /* Given */
+        database.insert(testAccount);
+        int accountId = testAccount.getId();
+
+        /* When */
+        Query query = database.table("account").where("account_id=?", accountId);
+        Account retreivedAccount = query.first(Account.class);
+
+        /* Then */
+        Assert.assertEquals(testAccount, retreivedAccount);
+    }
+
+    @Test
+    public void whenDeleteInDatabase() {
+
+        /* Given */
+        database.insert(testAccount);
+
+        /* When */
+        int affectedRow = database.delete(testAccount).getRowsAffected();
+
+        /* Then */
+        Assert.assertEquals(1, affectedRow);
     }
 }
