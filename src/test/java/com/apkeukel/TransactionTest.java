@@ -71,13 +71,17 @@ public class TransactionTest {
         String description = "Initial income";
 
         /* When */
-        testTransaction = new Transaction(accountId, amount, date, description);
+        Transaction testTransaction1 = new Transaction(accountId, amount, date, description);
+        Transaction testTransaction2 = new Transaction(mockAccount, amount, date, description);
+        Transaction[] testTransactions = {testTransaction1, testTransaction2};
 
         /* Then */
-        Assert.assertEquals(accountId, testTransaction.getAccountId());
-        Assert.assertEquals(amount, testTransaction.getAmount(), 0.0);
-        Assert.assertEquals(date, testTransaction.getDate());
-        Assert.assertEquals(description, testTransaction.getDescription());
+        for (Transaction testTransaction: testTransactions) {
+            Assert.assertEquals(accountId, testTransaction.getAccountId());
+            Assert.assertEquals(amount, testTransaction.getAmount(), 0.0);
+            Assert.assertEquals(date, testTransaction.getDate());
+            Assert.assertEquals(description, testTransaction.getDescription());
+        }
     }
 
     @Test

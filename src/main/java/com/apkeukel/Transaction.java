@@ -33,6 +33,11 @@ public class Transaction implements Serializable {
         this.setDate(date);
         this.setDescription(description);
     }
+
+    public Transaction(Account account, double amount,
+                       LocalDate date, String description) {
+        this(account.getId(), amount, date, description);
+    }
     //endregion
 
 
