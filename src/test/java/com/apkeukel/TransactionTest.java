@@ -95,4 +95,68 @@ public class TransactionTest {
         /* Then */
         Assert.assertEquals(accountId, testTransaction.getAccountId());
     }
+
+
+    //region Comparation tests
+    //==========================================================================
+    @Test
+    public void givenSelf_whenIsEquals_thenTrue() {
+        Assert.assertTrue(testTransaction.equals(testTransaction));  // see [ASSERTEQUALS]
+    }
+
+    @Test
+    public void givenSameTransactionButDifferentObjects_whenIsEquals_thenTrue() {
+        double amount = 500.0;
+        LocalDate date = LocalDate.now();
+        String description = "Initial income";
+
+        /* Given */
+        Transaction testTransaction1 = new Transaction(mockAccount, amount, date, description);
+        testTransaction1.setId(1);
+        Transaction testTransaction2 = new Transaction(mockAccount, amount, date, description);
+        testTransaction2.setId(1);
+
+        /* Then */
+        Assert.assertTrue(testTransaction1.equals(testTransaction2));  // see [ASSERTEQUALS]
+        Assert.assertTrue(testTransaction2.equals(testTransaction1));  // see [ASSERTEQUALS]
+    }
+
+    @Test
+    public void givenNull_whenIsEquals_thenFalse() {
+        Assert.assertFalse(testTransaction.equals(null));  // see [ASSERTEQUALS]
+    }
+
+    @Test
+    public void givenStrangeObject_whenIsEquals_thenFalse() {
+        Assert.assertFalse(testTransaction.equals(""));  // see [ASSERTEQUALS]
+    }
+
+    @Test
+    public void givenOutdatedTransaction_whenIsEquals_thenFalse() {
+
+        /* Given an instance with same ID but has different data */
+        double amount1 = 500.0;
+        double amount2 = 400.0;
+        LocalDate date = LocalDate.now();
+        String description = "Initial income";
+
+        Transaction testTransaction1 = new Transaction(mockAccount, amount1, date, description);
+        testTransaction1.setId(1);
+        Transaction testTransaction2 = new Transaction(mockAccount, amount2, date, description);
+        testTransaction2.setId(1);
+
+        /* Then */
+        Assert.assertFalse(testTransaction1.equals(testTransaction2));  // see [ASSERTEQUALS]
+        Assert.assertFalse(testTransaction2.equals(testTransaction1));  // see [ASSERTEQUALS]
+    }
+
+    /* Notes
+     *
+     * [ASSERTEQUALS] Manual invocation of the equals() methods
+     * is used as the assertEquals() and assertNotEquals() from
+     * Assert do not invoke the equals() which is the object of
+     * test.
+     */
+    //endregion
+
 }

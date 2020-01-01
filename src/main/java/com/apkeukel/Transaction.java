@@ -1,9 +1,12 @@
 package com.apkeukel;
 
 import javax.persistence.Column;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
 import javax.persistence.Table;
 import java.io.Serializable;
 import java.time.LocalDate;
+import java.util.Objects;
 
 
 @Table(name="transaction_")
@@ -44,10 +47,19 @@ public class Transaction implements Serializable {
     //region Properties
     //==========================================================================
 
+    private int transactionId;
     private int accountId;
     private double amount;
     private LocalDate date;
     private String description;
+
+
+    @Id
+    @GeneratedValue
+    @Column(name="tx_id")
+    public int getId() {
+        return this.transactionId;
+    }
 
     @Column(name="account_id")
     public int getAccountId() {
@@ -69,6 +81,10 @@ public class Transaction implements Serializable {
         return this.description;
     }
 
+    public void setId(int transactionId) {
+        this.transactionId = transactionId;
+    }
+
     public void setAccountId(int accountId) {
         this.accountId = accountId;
     }
@@ -87,6 +103,35 @@ public class Transaction implements Serializable {
 
     public void setAccount(Account account) {
         this.accountId = account.getId();
+    }
+    //endregion
+
+
+    //region Comparations
+    //==========================================================================
+
+    @Override
+    public boolean equals(Object comparate_) {
+
+        if (this == comparate_) {
+            return true;
+        }
+        if (comparate_ == null) {
+            return false;
+        }
+        if (this.getClass() != comparate_.getClass()) {
+            return false;
+        }
+        Transaction comparate = (Transaction) comparate_;
+        return this.hashCode() == comparate.hashCode();
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(
+                this.transactionId, this.accountId,
+                this.amount, this.date, this.description
+        );
     }
     //endregion
 
