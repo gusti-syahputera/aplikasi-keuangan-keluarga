@@ -13,7 +13,8 @@ import static org.mockito.Mockito.*;
 @RunWith(MockitoJUnitRunner.class)
 public class AccountTest {
 
-    @Mock private FamilyMember familyMember = new FamilyMember();
+    @Mock
+    private FamilyMember familyMember = new FamilyMember();
 
     private static Database database;
     private Account testAccount;
@@ -39,6 +40,21 @@ public class AccountTest {
     public void setUp() {
         when(familyMember.getId()).thenReturn(1);
 
+        /* Create test instance. Note that this process depend on
+         * the result of whenCreateWithParameterConstructor() */
+        String accountName = "General account";
+        testAccount = new Account(accountName, familyMember);
+    }
+    //endregion
+
+
+    //region General tests
+    //==========================================================================
+
+    @Test
+    public void whenCreateAndSetProperties() {
+
+        /* Given */
         String accountName = "General account";
 
         /* When */
@@ -50,11 +66,6 @@ public class AccountTest {
         Assert.assertEquals(accountName, testAccount.getAccountName());
         Assert.assertEquals(familyMember.getId(), testAccount.getOwnerId());
     }
-    //endregion
-
-
-    //region General tests
-    //==========================================================================
 
     @Test
     public void whenCreateWithParameterConstructor() {
@@ -76,11 +87,11 @@ public class AccountTest {
 
     @Test
     public void whenSetOwner() {
+
         /* When */
         testAccount.setOwner(familyMember);
 
         /* Then */
-        verify(familyMember, times(3)).getId();
         Assert.assertEquals(familyMember.getId(), testAccount.getOwnerId());
     }
     //endregion
@@ -168,6 +179,8 @@ public class AccountTest {
         Account retreivedAccount = query.first(Account.class);
 
         /* Then */
+        /* Note that this assertion depend on the result of
+         * givenSameAccountButDifferentObjects_whenIsEquals_thenTrue() */
         Assert.assertEquals(testAccount, retreivedAccount);
     }
 
