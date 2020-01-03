@@ -11,10 +11,10 @@ public class Transaction implements Serializable {
 
     public static String createTable =  // copied from definition.sql file
             "CREATE TABLE IF NOT EXISTS transaction_ (\n" +
-            "       tx_id       INTEGER PRIMARY KEY NOT NULL,\n" +
+            "       tx_id       INTEGER PRIMARY KEY,\n" +
             "       account_id  INTEGER NOT NULL,\n" +
-            "       amount      REAL NOT NULL,\n" +
-            "       date_       TEXT NOT NULL,  -- ISO8601 string: \"YYYY-MM-DD HH:MM:SS.SSS\"\n" +
+            "       date_       TEXT    NOT NULL,\n" +
+            "       amount      NUMERIC NOT NULL,\n" +
             "       description TEXT,\n" +
             "       FOREIGN KEY (account_id) REFERENCES account(account_id)\n" +
             "         ON DELETE SET NULL\n" +
