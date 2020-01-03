@@ -10,10 +10,9 @@ public class Account implements Serializable {
 
     public static String createTable =  // copied from definition.sql file
             "CREATE TABLE IF NOT EXISTS account (\n" +
-            "       account_id   INTEGER PRIMARY KEY NOT NULL,\n" +
+            "       account_id   INTEGER PRIMARY KEY,\n" +
             "       account_name TEXT    NOT NULL,\n" +
             "       owner_id     INTEGER NOT NULL,\n" +
-            "       balance      INTEGER NOT NULL,\n" +
             "       FOREIGN KEY (owner_id) REFERENCES member(member_id)\n" +
             "         ON DELETE SET NULL\n" +
             ");";
@@ -24,14 +23,13 @@ public class Account implements Serializable {
 
     public Account() {}
 
-    public Account(String accountName, int ownerId, int balance) {
+    public Account(String accountName, int ownerId) {
         this.setAccountName(accountName);
         this.setOwnerId(ownerId);
-        this.setBalance(balance);
     }
 
-    public Account(String accountName, FamilyMember owner, int balance) {
-        this(accountName, owner.getId(), balance);
+    public Account(String accountName, FamilyMember owner) {
+        this(accountName, owner.getId());
     }
     //endregion
 
@@ -42,7 +40,6 @@ public class Account implements Serializable {
     private int accountId;
     private String accountName;
     private int ownerId;
-    private int balance;
 
     @Id
     @GeneratedValue
@@ -61,11 +58,6 @@ public class Account implements Serializable {
         return ownerId;
     }
 
-    @Column(name="balance")
-    public int getBalance() {
-        return this.balance;
-    }
-
     public void setId(int accountId) {
         this.accountId = accountId;
     }
@@ -80,10 +72,6 @@ public class Account implements Serializable {
 
     public void setOwner(FamilyMember owner) {
         this.ownerId = owner.getId();
-    }
-
-    public void setBalance(int balance) {
-        this.balance = balance;
     }
     //endregion
 
@@ -109,10 +97,7 @@ public class Account implements Serializable {
 
     @Override
     public int hashCode() {
-        return Objects.hash(
-                this.accountId, this.accountName,
-                this.ownerId, this.balance
-        );
+        return Objects.hash(this.accountId, this.accountName, this.ownerId);
     }
     //endregion
 

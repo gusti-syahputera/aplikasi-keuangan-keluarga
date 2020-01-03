@@ -15,9 +15,9 @@ public class FamilyMember implements Serializable {
 
     public static String createTable =  // copied from definition.sql file
             "CREATE TABLE IF NOT EXISTS member (\n" +
-            "       member_id  INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,\n" +
+            "       member_id  INTEGER PRIMARY KEY,\n" +
             "       full_name  TEXT    NOT NULL,\n" +
-            "       birth_date TEXT,  -- ISO8601 string: \"YYYY-MM-DD HH:MM:SS.SSS\"\n" +
+            "       birth_date TEXT,\n" +
             "       role       INTEGER DEFAULT 0, -- Enum(ORDINARY, ACCOUNTANT, CHIEF)\n" +
             "       pass_key   TEXT    DEFAULT NULL\n" +
             ");";
