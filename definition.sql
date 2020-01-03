@@ -1,7 +1,7 @@
 -- SQLite database definition used in the application
 
 CREATE TABLE IF NOT EXISTS member (
-       member_id  INTEGER PRIMARY KEY NOT NULL,
+       member_id  INTEGER PRIMARY KEY,
        full_name  TEXT    NOT NULL,
        birth_date TEXT,  -- ISO8601 string: "YYYY-MM-DD"
        role       INTEGER DEFAULT 0, -- Enum(ORDINARY, ACCOUNTANT, CHIEF)
@@ -9,7 +9,7 @@ CREATE TABLE IF NOT EXISTS member (
 );
 
 CREATE TABLE IF NOT EXISTS account (
-       account_id   INTEGER PRIMARY KEY NOT NULL,
+       account_id   INTEGER PRIMARY KEY,
        account_name TEXT    NOT NULL,
        owner_id     INTEGER NOT NULL,
        balance      REAL    NOT NULL DEFAULT .0,
@@ -18,7 +18,7 @@ CREATE TABLE IF NOT EXISTS account (
 );
 
 CREATE TABLE IF NOT EXISTS transaction_ (
-       tx_id       INTEGER PRIMARY KEY NOT NULL,
+       tx_id       INTEGER PRIMARY KEY,
        account_id  INTEGER NOT NULL,
        amount      REAL    NOT NULL,
        date_       TEXT    NOT NULL,  -- ISO8601 string: "YYYY-MM-DD"
