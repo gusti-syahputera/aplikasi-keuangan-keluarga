@@ -18,7 +18,7 @@ public class Account implements Serializable {
             ");";
 
 
-    //region Constructor
+    //region Constructors
     //==========================================================================
 
     public Account() {}

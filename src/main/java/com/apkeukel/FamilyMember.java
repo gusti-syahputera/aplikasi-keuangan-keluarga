@@ -23,11 +23,15 @@ public class FamilyMember implements Serializable {
             ");";
 
 
+    //region Constructors
+    //==========================================================================
+    //endregion
+
+
     //region Properties
     //==========================================================================
 
-    @Inject
-    private SimplePBKDF2 pbkdf2;
+    @Inject private SimplePBKDF2 pbkdf2;
 
     private int memberId;
     private String fullName;
@@ -72,7 +76,7 @@ public class FamilyMember implements Serializable {
         return Period.between(LocalDate.now(), this.birthDate).getYears();
     }
 
-    @Enumerated  // to save the value as number in the database
+    @Enumerated  // to store the value as numeric in the database
     @Column(name="role")
     public Role getRole() {
         return role;
@@ -83,7 +87,6 @@ public class FamilyMember implements Serializable {
         return passKey;
     }
 
-    @Deprecated  // used by Norm for loading data from the database
     public void setId(int memberId) {
         this.memberId = memberId;
     }
@@ -113,6 +116,15 @@ public class FamilyMember implements Serializable {
     public void setPassword(String password) {
         this.passKey = pbkdf2.deriveKeyFormatted(password);
     }
+
+    /*
+     * Notes
+     *
+     * [DATENORM] Norm loads date to pojo as String instead of LocalDate.
+     * One trick for this situation is to make a pair of setter and getter
+     * for a dummy property `birthDate_` which attached to the date
+     * column in the database table.
+     */
     //endregion
 
 
@@ -143,15 +155,3 @@ public class FamilyMember implements Serializable {
     //endregion
 
 }
-
-
-/*
- * Notes
- *
- * TODO: Add Javadoc for all public field and methods
- *
- * [DATENORM] Norm loads date to pojo as String instead of LocalDate.
- * One trick for this situation is to make a pair of setter and getter
- * for a dummy property `birthDate_` which attached to the date
- * column in the database table.
- */

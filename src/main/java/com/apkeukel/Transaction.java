@@ -50,7 +50,6 @@ public class Transaction implements Serializable {
     private LocalDate date;
     private String description;
 
-
     @Id
     @GeneratedValue
     @Column(name="tx_id")
