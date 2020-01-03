@@ -15,7 +15,8 @@ import static org.mockito.Mockito.when;
 @RunWith(MockitoJUnitRunner.class)
 public class TransactionTest {
 
-    @Mock private Account mockAccount = new Account();
+    @Mock
+    private Account mockAccount = new Account();
 
     private static Database database;
     private Transaction testTransaction;
@@ -38,9 +39,27 @@ public class TransactionTest {
     }
 
     @Before
-    public void whenCreateAndSetProperties() {
+    public void setUp() {
         when(mockAccount.getId()).thenReturn(1);
 
+        /* Create test instance. Note that this process depend on
+         * the result of whenCreateWithParameterConstructor() */
+        int accountId = mockAccount.getId();
+        double amount = 500.0;
+        LocalDate date = LocalDate.now();
+        String description = "Initial income";
+        testTransaction = new Transaction(accountId, amount, date, description);
+    }
+    //endregion
+
+
+    //region General tests
+    //==========================================================================
+
+    @Test
+    public void whenCreateAndSetProperties() {
+
+        /* Given */
         int accountId = mockAccount.getId();
         double amount = 500.0;
         LocalDate date = LocalDate.now();
@@ -59,11 +78,6 @@ public class TransactionTest {
         Assert.assertEquals(date, testTransaction.getDate());
         Assert.assertEquals(description, testTransaction.getDescription());
     }
-    //endregion
-
-
-    //region General tests
-    //==========================================================================
 
     @Test
     public void whenCreateWithParameterConstructor() {
@@ -191,6 +205,8 @@ public class TransactionTest {
         Transaction retreivedAccount = query.first(Transaction.class);
 
         /* Then */
+        /* Note that this assertion depend on the result of
+         * givenSameTransactionButDifferentObjects_whenIsEquals_thenTrue() */
         Assert.assertEquals(testTransaction, retreivedAccount);
     }
 
