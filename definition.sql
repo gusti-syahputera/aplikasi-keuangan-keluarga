@@ -12,7 +12,6 @@ CREATE TABLE IF NOT EXISTS account (
        account_id   INTEGER PRIMARY KEY,
        account_name TEXT    NOT NULL,
        owner_id     INTEGER NOT NULL,
-       balance      REAL    NOT NULL DEFAULT .0,
        FOREIGN KEY (owner_id) REFERENCES member(member_id)
          ON DELETE SET NULL
 );
@@ -20,8 +19,8 @@ CREATE TABLE IF NOT EXISTS account (
 CREATE TABLE IF NOT EXISTS transaction_ (
        tx_id       INTEGER PRIMARY KEY,
        account_id  INTEGER NOT NULL,
-       amount      REAL    NOT NULL,
        date_       TEXT    NOT NULL,  -- ISO8601 string: "YYYY-MM-DD"
+       amount      NUMERIC NOT NULL,
        description TEXT,
        FOREIGN KEY (account_id) REFERENCES account(account_id)
          ON DELETE SET NULL
