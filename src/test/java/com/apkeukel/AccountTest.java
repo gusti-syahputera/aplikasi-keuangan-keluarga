@@ -40,18 +40,15 @@ public class AccountTest {
         when(familyMember.getId()).thenReturn(1);
 
         String accountName = "General account";
-        int balance = 5000;
 
         /* When */
         testAccount = new Account();
         testAccount.setAccountName(accountName);
         testAccount.setOwnerId(familyMember.getId());
-        testAccount.setBalance(balance);
 
         /* Then */
         Assert.assertEquals(accountName, testAccount.getAccountName());
         Assert.assertEquals(familyMember.getId(), testAccount.getOwnerId());
-        Assert.assertEquals(balance, testAccount.getBalance());
     }
     //endregion
 
@@ -67,12 +64,11 @@ public class AccountTest {
     public void givenSameAccountButDifferentObjects_whenIsEquals_thenTrue() {
         String accountName = "Test Account";
         FamilyMember owner = familyMember;
-        int balance = 5000;
 
         /* Given */
-        Account account1 = new Account(accountName, owner, balance);
+        Account account1 = new Account(accountName, owner);
         account1.setId(1);
-        Account account2 = new Account(accountName, owner, balance);
+        Account account2 = new Account(accountName, owner);
         account2.setId(1);
 
         /* Then */
@@ -94,9 +90,9 @@ public class AccountTest {
     public void givenOutdatedAccount_whenIsEquals_thenFalse() {
 
         /* Given an instance with same ID but has different data */
-        Account account1 = new Account("Test Account", 1, 5000);
+        Account account1 = new Account("Test Account", 1);
         account1.setId(1);
-        Account account2 = new Account("Test Account", 1, 4000);
+        Account account2 = new Account("Test Account", 2);
         account2.setId(1);
 
         /* Then */
@@ -119,18 +115,16 @@ public class AccountTest {
 
         /* Given */
         String accountName = "General account";
-        int balance = 5000;
 
         /* When */
-        Account newAccount1 = new Account(accountName, familyMember, balance);
-        Account newAccount2 = new Account(accountName, familyMember.getId(), balance);
+        Account newAccount1 = new Account(accountName, familyMember);
+        Account newAccount2 = new Account(accountName, familyMember.getId());
         Account[] newAccounts = {newAccount1, newAccount2};
 
         /* Then */
         for (Account newAccount: newAccounts) {
             Assert.assertEquals(accountName, newAccount.getAccountName());
             Assert.assertEquals(familyMember.getId(), newAccount.getOwnerId());
-            Assert.assertEquals(balance, newAccount.getBalance());
         }
     }
 
