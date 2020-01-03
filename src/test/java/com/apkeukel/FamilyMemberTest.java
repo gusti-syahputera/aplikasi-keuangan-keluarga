@@ -76,7 +76,36 @@ public class FamilyMemberTest {
     //endregion
 
 
-    //region Comparations
+    //region General tests
+    //==========================================================================
+
+    @Test
+    public void givenCreatedFamilyMember_whenSetBiodata() {
+
+        /* Given blankFamilyMember, which is already initialized and
+         * injected but have not get its properties populated. */
+
+        /* When */
+        String fullName = "Foo Bar";
+        LocalDate birthDate = LocalDate.of(1999, 12, 31);
+        Role role = Role.ORDINARY;
+        String password = "Spam Egg2";
+
+        blankFamilyMember.setBiodata(fullName, birthDate, role, password);
+        int memberAge = Period.between(LocalDate.now(), blankFamilyMember.getBirthDate()).getYears();
+
+        /* Then */
+        Assert.assertEquals(fullName, blankFamilyMember.getFullName());
+        Assert.assertEquals(birthDate, blankFamilyMember.getBirthDate());
+        Assert.assertEquals(role, blankFamilyMember.getRole());
+        Assert.assertEquals(memberAge, blankFamilyMember.getAge());
+        verify(pbkdf2, times(2))  // note that the mock is also used by setUp's familyMember
+                .deriveKeyFormatted(anyString());         // therefore 2 invocations is expected
+    }
+    //endregion
+
+
+    //region Comparation tests
     //==========================================================================
     @Test
     public void givenSelf_whenIsEquals_thenTrue() {
@@ -113,29 +142,8 @@ public class FamilyMemberTest {
     //endregion
 
 
-    @Test
-    public void givenCreatedFamilyMember_whenSetBiodata() {
-
-        /* Given blankFamilyMember, which is already initialized and
-         * injected but have not get its properties populated. */
-
-        /* When */
-        String fullName = "Foo Bar";
-        LocalDate birthDate = LocalDate.of(1999, 12, 31);
-        Role role = Role.ORDINARY;
-        String password = "Spam Egg2";
-
-        blankFamilyMember.setBiodata(fullName, birthDate, role, password);
-        int memberAge = Period.between(LocalDate.now(), blankFamilyMember.getBirthDate()).getYears();
-
-        /* Then */
-        Assert.assertEquals(fullName, blankFamilyMember.getFullName());
-        Assert.assertEquals(birthDate, blankFamilyMember.getBirthDate());
-        Assert.assertEquals(role, blankFamilyMember.getRole());
-        Assert.assertEquals(memberAge, blankFamilyMember.getAge());
-        verify(pbkdf2, times(2))  // note that the mock is also used by setUp's familyMember
-                .deriveKeyFormatted(anyString());         // therefore 2 invocations is expected
-    }
+    //region Persistency tests
+    //==========================================================================
 
     @Test
     public void whenInsertToDatabase_thenGetGeneratedId() {
@@ -194,5 +202,6 @@ public class FamilyMemberTest {
         /* Then */
         Assert.assertEquals(familyMember, retreivedMember);
     }
+    //endregion
 
 }

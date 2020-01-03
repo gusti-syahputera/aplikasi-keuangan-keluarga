@@ -62,6 +62,9 @@ public class TransactionTest {
     //endregion
 
 
+    //region General tests
+    //==========================================================================
+
     @Test
     public void whenCreateWithParameterConstructor() {
         when(mockAccount.getId()).thenReturn(1);
@@ -97,6 +100,7 @@ public class TransactionTest {
         /* Then */
         Assert.assertEquals(accountId, testTransaction.getAccountId());
     }
+    //endregion
 
 
     //region Comparation tests

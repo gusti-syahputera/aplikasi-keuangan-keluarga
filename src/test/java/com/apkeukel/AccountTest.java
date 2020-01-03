@@ -53,7 +53,40 @@ public class AccountTest {
     //endregion
 
 
-    //region Comparations
+    //region General tests
+    //==========================================================================
+
+    @Test
+    public void whenCreateWithParameterConstructor() {
+
+        /* Given */
+        String accountName = "General account";
+
+        /* When */
+        Account newAccount1 = new Account(accountName, familyMember);
+        Account newAccount2 = new Account(accountName, familyMember.getId());
+        Account[] newAccounts = {newAccount1, newAccount2};
+
+        /* Then */
+        for (Account newAccount: newAccounts) {
+            Assert.assertEquals(accountName, newAccount.getAccountName());
+            Assert.assertEquals(familyMember.getId(), newAccount.getOwnerId());
+        }
+    }
+
+    @Test
+    public void whenSetOwner() {
+        /* When */
+        testAccount.setOwner(familyMember);
+
+        /* Then */
+        verify(familyMember, times(3)).getId();
+        Assert.assertEquals(familyMember.getId(), testAccount.getOwnerId());
+    }
+    //endregion
+
+
+    //region Comparation tests
     //==========================================================================
     @Test
     public void givenSelf_whenIsEquals_thenTrue() {
@@ -110,33 +143,8 @@ public class AccountTest {
     //endregion
 
 
-    @Test
-    public void whenCreateWithParameterConstructor() {
-
-        /* Given */
-        String accountName = "General account";
-
-        /* When */
-        Account newAccount1 = new Account(accountName, familyMember);
-        Account newAccount2 = new Account(accountName, familyMember.getId());
-        Account[] newAccounts = {newAccount1, newAccount2};
-
-        /* Then */
-        for (Account newAccount: newAccounts) {
-            Assert.assertEquals(accountName, newAccount.getAccountName());
-            Assert.assertEquals(familyMember.getId(), newAccount.getOwnerId());
-        }
-    }
-
-    @Test
-    public void whenSetOwner() {
-        /* When */
-        testAccount.setOwner(familyMember);
-
-        /* Then */
-        verify(familyMember, times(3)).getId();
-        Assert.assertEquals(familyMember.getId(), testAccount.getOwnerId());
-    }
+    //region Persistency tests
+    //==========================================================================
 
     @Test
     public void whenInsertToDatabase_thenGetGeneratedId() {
@@ -175,4 +183,6 @@ public class AccountTest {
         /* Then */
         Assert.assertEquals(1, affectedRow);
     }
+    //endregion
+
 }
