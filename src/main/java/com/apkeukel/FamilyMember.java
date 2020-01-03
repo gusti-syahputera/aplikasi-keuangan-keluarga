@@ -50,15 +50,6 @@ public class FamilyMember implements Serializable {
     private Role role;
     private String passKey;
 
-    @Transient
-    public void setBiodata(String fullName, LocalDate birthDate,
-                           Role role, String password) {
-        this.fullName = fullName;
-        this.birthDate = birthDate;
-        this.role = role;
-        this.setPassword(password);
-    }
-
     @Id
     @GeneratedValue
     @Column(name="member_id")
