@@ -15,7 +15,8 @@ import static org.mockito.Mockito.when;
 @RunWith(MockitoJUnitRunner.class)
 public class TransactionTest {
 
-    @Mock private Account mockAccount = new Account();
+    @Mock
+    private Account mockAccount = new Account();
 
     private static Database database;
     private Transaction testTransaction;
@@ -28,8 +29,8 @@ public class TransactionTest {
     public static void databaseSetUp() {
         database = new Database();
         database.setJdbcUrl("jdbc:sqlite:test.db");
-        database.sql("DROP TABLE IF EXISTS transaction_").execute();
-        database.sql(Transaction.createTable).execute();
+        database.sql(Transaction.dropTableQuery).execute();
+        database.sql(Transaction.createTableQuery).execute();
     }
 
     @AfterClass
@@ -38,9 +39,27 @@ public class TransactionTest {
     }
 
     @Before
-    public void whenCreateAndSetProperties() {
+    public void setUp() {
         when(mockAccount.getId()).thenReturn(1);
 
+        /* Create test instance. Note that this process depend on
+         * the result of whenCreateWithParameterConstructor() */
+        int accountId = mockAccount.getId();
+        double amount = 500.0;
+        LocalDate date = LocalDate.now();
+        String description = "Initial income";
+        testTransaction = new Transaction(accountId, amount, date, description);
+    }
+    //endregion
+
+
+    //region General tests
+    //==========================================================================
+
+    @Test
+    public void whenCreateAndSetProperties() {
+
+        /* Given */
         int accountId = mockAccount.getId();
         double amount = 500.0;
         LocalDate date = LocalDate.now();
@@ -59,8 +78,6 @@ public class TransactionTest {
         Assert.assertEquals(date, testTransaction.getDate());
         Assert.assertEquals(description, testTransaction.getDescription());
     }
-    //endregion
-
 
     @Test
     public void whenCreateWithParameterConstructor() {
@@ -97,6 +114,7 @@ public class TransactionTest {
         /* Then */
         Assert.assertEquals(accountId, testTransaction.getAccountId());
     }
+    //endregion
 
 
     //region Comparation tests
@@ -183,10 +201,12 @@ public class TransactionTest {
         int transactionId = testTransaction.getId();
 
         /* When */
-        Query query = database.table("transaction_").where("tx_id=?", transactionId);
+        Query query = database.table(Transaction.tableName).where(Transaction.whereKeyClause, transactionId);
         Transaction retreivedAccount = query.first(Transaction.class);
 
         /* Then */
+        /* Note that this assertion depend on the result of
+         * givenSameTransactionButDifferentObjects_whenIsEquals_thenTrue() */
         Assert.assertEquals(testTransaction, retreivedAccount);
     }
 

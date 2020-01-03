@@ -13,7 +13,8 @@ import static org.mockito.Mockito.*;
 @RunWith(MockitoJUnitRunner.class)
 public class AccountTest {
 
-    @Mock private FamilyMember familyMember = new FamilyMember();
+    @Mock
+    private FamilyMember familyMember = new FamilyMember();
 
     private static Database database;
     private Account testAccount;
@@ -26,8 +27,8 @@ public class AccountTest {
     public static void databaseSetUp() {
         database = new Database();
         database.setJdbcUrl("jdbc:sqlite:test.db");
-        database.sql("DROP TABLE IF EXISTS account").execute();
-        database.sql(Account.createTable).execute();
+        database.sql(Account.dropTableQuery).execute();
+        database.sql(Account.createTableQuery).execute();
     }
 
     @AfterClass
@@ -39,6 +40,21 @@ public class AccountTest {
     public void setUp() {
         when(familyMember.getId()).thenReturn(1);
 
+        /* Create test instance. Note that this process depend on
+         * the result of whenCreateWithParameterConstructor() */
+        String accountName = "General account";
+        testAccount = new Account(accountName, familyMember);
+    }
+    //endregion
+
+
+    //region General tests
+    //==========================================================================
+
+    @Test
+    public void whenCreateAndSetProperties() {
+
+        /* Given */
         String accountName = "General account";
 
         /* When */
@@ -50,10 +66,38 @@ public class AccountTest {
         Assert.assertEquals(accountName, testAccount.getAccountName());
         Assert.assertEquals(familyMember.getId(), testAccount.getOwnerId());
     }
+
+    @Test
+    public void whenCreateWithParameterConstructor() {
+
+        /* Given */
+        String accountName = "General account";
+
+        /* When */
+        Account newAccount1 = new Account(accountName, familyMember);
+        Account newAccount2 = new Account(accountName, familyMember.getId());
+        Account[] newAccounts = {newAccount1, newAccount2};
+
+        /* Then */
+        for (Account newAccount: newAccounts) {
+            Assert.assertEquals(accountName, newAccount.getAccountName());
+            Assert.assertEquals(familyMember.getId(), newAccount.getOwnerId());
+        }
+    }
+
+    @Test
+    public void whenSetOwner() {
+
+        /* When */
+        testAccount.setOwner(familyMember);
+
+        /* Then */
+        Assert.assertEquals(familyMember.getId(), testAccount.getOwnerId());
+    }
     //endregion
 
 
-    //region Comparations
+    //region Comparation tests
     //==========================================================================
     @Test
     public void givenSelf_whenIsEquals_thenTrue() {
@@ -110,33 +154,8 @@ public class AccountTest {
     //endregion
 
 
-    @Test
-    public void whenCreateWithParameterConstructor() {
-
-        /* Given */
-        String accountName = "General account";
-
-        /* When */
-        Account newAccount1 = new Account(accountName, familyMember);
-        Account newAccount2 = new Account(accountName, familyMember.getId());
-        Account[] newAccounts = {newAccount1, newAccount2};
-
-        /* Then */
-        for (Account newAccount: newAccounts) {
-            Assert.assertEquals(accountName, newAccount.getAccountName());
-            Assert.assertEquals(familyMember.getId(), newAccount.getOwnerId());
-        }
-    }
-
-    @Test
-    public void whenSetOwner() {
-        /* When */
-        testAccount.setOwner(familyMember);
-
-        /* Then */
-        verify(familyMember, times(3)).getId();
-        Assert.assertEquals(familyMember.getId(), testAccount.getOwnerId());
-    }
+    //region Persistency tests
+    //==========================================================================
 
     @Test
     public void whenInsertToDatabase_thenGetGeneratedId() {
@@ -156,10 +175,12 @@ public class AccountTest {
         int accountId = testAccount.getId();
 
         /* When */
-        Query query = database.table("account").where("account_id=?", accountId);
+        Query query = database.table(Account.tableName).where(Account.whereKeyClause, accountId);
         Account retreivedAccount = query.first(Account.class);
 
         /* Then */
+        /* Note that this assertion depend on the result of
+         * givenSameAccountButDifferentObjects_whenIsEquals_thenTrue() */
         Assert.assertEquals(testAccount, retreivedAccount);
     }
 
@@ -175,4 +196,6 @@ public class AccountTest {
         /* Then */
         Assert.assertEquals(1, affectedRow);
     }
+    //endregion
+
 }

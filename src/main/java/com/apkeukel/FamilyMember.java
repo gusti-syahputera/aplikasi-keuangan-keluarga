@@ -13,7 +13,7 @@ import java.util.Objects;
 @Table(name="member")
 public class FamilyMember implements Serializable {
 
-    public static String createTable =  // copied from definition.sql file
+    public final static String createTableQuery =  // copied from definition.sql file
             "CREATE TABLE IF NOT EXISTS member (\n" +
             "       member_id  INTEGER PRIMARY KEY,\n" +
             "       full_name  TEXT    NOT NULL,\n" +
@@ -21,13 +21,28 @@ public class FamilyMember implements Serializable {
             "       role       INTEGER DEFAULT 0, -- Enum(ORDINARY, ACCOUNTANT, CHIEF)\n" +
             "       pass_key   TEXT    DEFAULT NULL\n" +
             ");";
+    public final static String dropTableQuery = "DROP TABLE IF EXISTS member;";
+    public final static String tableName = "member";
+    public final static String whereKeyClause = "member_id=?";
+
+    //region Constructors
+    //==========================================================================
+    public FamilyMember() {}
+
+    public FamilyMember(String fullName, LocalDate birthDate,
+                        Role role, String passkey) {
+        this.setFullName(fullName);
+        this.setBirthDate(birthDate);
+        this.setRole(role);
+        this.setPassKey(passkey);
+    }
+    //endregion
 
 
     //region Properties
     //==========================================================================
 
-    @Inject
-    private SimplePBKDF2 pbkdf2;
+    @Inject private SimplePBKDF2 pbkdf2;
 
     private int memberId;
     private String fullName;
@@ -72,7 +87,7 @@ public class FamilyMember implements Serializable {
         return Period.between(LocalDate.now(), this.birthDate).getYears();
     }
 
-    @Enumerated  // to save the value as number in the database
+    @Enumerated  // to store the value as numeric in the database
     @Column(name="role")
     public Role getRole() {
         return role;
@@ -83,7 +98,6 @@ public class FamilyMember implements Serializable {
         return passKey;
     }
 
-    @Deprecated  // used by Norm for loading data from the database
     public void setId(int memberId) {
         this.memberId = memberId;
     }
@@ -113,6 +127,15 @@ public class FamilyMember implements Serializable {
     public void setPassword(String password) {
         this.passKey = pbkdf2.deriveKeyFormatted(password);
     }
+
+    /*
+     * Notes
+     *
+     * [DATENORM] Norm loads date to pojo as String instead of LocalDate.
+     * One trick for this situation is to make a pair of setter and getter
+     * for a dummy property `birthDate_` which attached to the date
+     * column in the database table.
+     */
     //endregion
 
 
@@ -143,15 +166,3 @@ public class FamilyMember implements Serializable {
     //endregion
 
 }
-
-
-/*
- * Notes
- *
- * TODO: Add Javadoc for all public field and methods
- *
- * [DATENORM] Norm loads date to pojo as String instead of LocalDate.
- * One trick for this situation is to make a pair of setter and getter
- * for a dummy property `birthDate_` which attached to the date
- * column in the database table.
- */

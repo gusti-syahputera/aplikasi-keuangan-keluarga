@@ -9,7 +9,7 @@ import java.util.Objects;
 @Table(name="transaction_")
 public class Transaction implements Serializable {
 
-    public static String createTable =  // copied from definition.sql file
+    public final static String createTableQuery =  // copied from definition.sql file
             "CREATE TABLE IF NOT EXISTS transaction_ (\n" +
             "       tx_id       INTEGER PRIMARY KEY,\n" +
             "       account_id  INTEGER NOT NULL,\n" +
@@ -19,7 +19,9 @@ public class Transaction implements Serializable {
             "       FOREIGN KEY (account_id) REFERENCES account(account_id)\n" +
             "         ON DELETE SET NULL\n" +
             ");";
-
+    public final static String dropTableQuery = "DROP TABLE IF EXISTS transaction_;";
+    public final static String tableName = "transaction_";
+    public final static String whereKeyClause = "tx_id=?";
 
     //region Constructors
     //==========================================================================
@@ -49,7 +51,6 @@ public class Transaction implements Serializable {
     private double amount;
     private LocalDate date;
     private String description;
-
 
     @Id
     @GeneratedValue
