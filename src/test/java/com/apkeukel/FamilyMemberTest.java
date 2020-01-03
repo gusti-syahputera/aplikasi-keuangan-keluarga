@@ -19,14 +19,12 @@ import static org.mockito.Mockito.*;
 @RunWith(MockitoJUnitRunner.class)
 public class FamilyMemberTest {
 
-    @Mock
-    private SimplePBKDF2 pbkdf2;
+    @Mock private SimplePBKDF2 pbkdf2;
 
     @InjectMocks
-    private FamilyMember familyMember = new FamilyMember();
+    private FamilyMember injectedFamilyMember = new FamilyMember();
 
-    @InjectMocks
-    private FamilyMember blankFamilyMember = new FamilyMember();
+    private FamilyMember testFamilyMember;
 
     private static Database database;
 
@@ -49,29 +47,15 @@ public class FamilyMemberTest {
 
     @Before
     public void setUp() {
-
-        /* Set up mocks */
         when(pbkdf2.deriveKeyFormatted(anyString())).thenReturn("");
 
-        /* Given */
+        /* Prepare test instance. Note that this process depend on
+         * the result of whenCreateWithParameterConstructor() */
         String fullName = "Foo Bar";
         LocalDate birthDate = LocalDate.of(1999, 12, 31);
         Role role = Role.ORDINARY;
-        String password = "Spam Egg";
-
-        /* When */
-        familyMember.setFullName(fullName);
-        familyMember.setBirthDate(birthDate);
-        familyMember.setRole(role);
-        familyMember.setPassword(password);
-        int memberAge = Period.between(LocalDate.now(), familyMember.getBirthDate()).getYears();
-
-        /* Then */
-        Assert.assertEquals(fullName, familyMember.getFullName());
-        Assert.assertEquals(birthDate, familyMember.getBirthDate());
-        Assert.assertEquals(role, familyMember.getRole());
-        Assert.assertEquals(memberAge, familyMember.getAge());
-        verify(pbkdf2).deriveKeyFormatted(anyString());
+        String passkey = "1DE7699A91D40069:1000:E8A86EE8A1B866E4C86D609760C385553D9F5AAF";
+        testFamilyMember = new FamilyMember(fullName, birthDate, role, passkey);
     }
     //endregion
 
@@ -80,27 +64,60 @@ public class FamilyMemberTest {
     //==========================================================================
 
     @Test
-    public void givenCreatedFamilyMember_whenSetBiodata() {
+    public void whenCreateAndSetProperties() {
 
-        /* Given blankFamilyMember, which is already initialized and
-         * injected but have not get its properties populated. */
-
-        /* When */
+        /* Given */
         String fullName = "Foo Bar";
         LocalDate birthDate = LocalDate.of(1999, 12, 31);
         Role role = Role.ORDINARY;
-        String password = "Spam Egg2";
+        String passkey = "1DE7699A91D40069:1000:E8A86EE8A1B866E4C86D609760C385553D9F5AAF";
 
-        blankFamilyMember.setBiodata(fullName, birthDate, role, password);
-        int memberAge = Period.between(LocalDate.now(), blankFamilyMember.getBirthDate()).getYears();
+        /* When */
+        testFamilyMember = new FamilyMember();
+        testFamilyMember.setFullName(fullName);
+        testFamilyMember.setBirthDate(birthDate);
+        testFamilyMember.setRole(role);
+        testFamilyMember.setPassKey(passkey);
+        int memberAge = Period.between(LocalDate.now(), testFamilyMember.getBirthDate()).getYears();
 
         /* Then */
-        Assert.assertEquals(fullName, blankFamilyMember.getFullName());
-        Assert.assertEquals(birthDate, blankFamilyMember.getBirthDate());
-        Assert.assertEquals(role, blankFamilyMember.getRole());
-        Assert.assertEquals(memberAge, blankFamilyMember.getAge());
-        verify(pbkdf2, times(2))  // note that the mock is also used by setUp's familyMember
-                .deriveKeyFormatted(anyString());         // therefore 2 invocations is expected
+        Assert.assertEquals(fullName, testFamilyMember.getFullName());
+        Assert.assertEquals(birthDate, testFamilyMember.getBirthDate());
+        Assert.assertEquals(role, testFamilyMember.getRole());
+        Assert.assertEquals(passkey, testFamilyMember.getPassKey());
+        Assert.assertEquals(memberAge, testFamilyMember.getAge());
+    }
+
+    @Test
+    public void whenCreateWithParameterConstructor() {
+
+        /* Given */
+        String fullName = "Foo Bar";
+        LocalDate birthDate = LocalDate.of(1999, 12, 31);
+        Role role = Role.ORDINARY;
+        String passkey = "1DE7699A91D40069:1000:E8A86EE8A1B866E4C86D609760C385553D9F5AAF";
+
+        /* When */
+        FamilyMember testFamilyMember = new FamilyMember(fullName, birthDate, role, passkey);
+
+        /* Then */
+        Assert.assertEquals(fullName, testFamilyMember.getFullName());
+        Assert.assertEquals(birthDate, testFamilyMember.getBirthDate());
+        Assert.assertEquals(role, testFamilyMember.getRole());
+        Assert.assertEquals(passkey, testFamilyMember.getPassKey());
+    }
+
+    @Test
+    public void whenSetPassword() {
+
+        /* Given */
+        String password = "Spam Egg";
+
+        /* When */
+        injectedFamilyMember.setPassword(password);
+
+        /* Then */
+        verify(pbkdf2).deriveKeyFormatted(password);
     }
     //endregion
 
@@ -109,36 +126,61 @@ public class FamilyMemberTest {
     //==========================================================================
     @Test
     public void givenSelf_whenIsEquals_thenTrue() {
-        Assert.assertEquals(familyMember, familyMember);
+        Assert.assertEquals(testFamilyMember, testFamilyMember);
+    }
+
+    @Test
+    public void givenSameFamilyMemberButDifferentObjects_whenIsEquals_thenTrue() {
+        String fullName = "Foo Bar";
+        LocalDate birthDate = LocalDate.of(1999, 12, 31);
+        Role role = Role.ORDINARY;
+        String passkey = "1DE7699A91D40069:1000:E8A86EE8A1B866E4C86D609760C385553D9F5AAF";
+
+        /* Given */
+        FamilyMember testFamilyMember1 = new FamilyMember(fullName, birthDate, role, passkey);
+        FamilyMember testFamilyMember2 = new FamilyMember(fullName, birthDate, role, passkey);
+
+        /* Then */
+        Assert.assertTrue(testFamilyMember1.equals(testFamilyMember2));  // see [ASSERTEQUALS]
+        Assert.assertTrue(testFamilyMember2.equals(testFamilyMember1));  // see [ASSERTEQUALS]
     }
 
     @Test
     public void givenNull_whenIsEquals_thenFalse() {
-        /* assertFalse is used instead assertNotEquals to make
-         * sure that the equals method of the FamilyMember instance
-         * is invoked (not the comparate's). */
-        Assert.assertFalse(familyMember.equals(null));
+        Assert.assertFalse(testFamilyMember.equals(null));
     }
 
     @Test
     public void givenStrangeObject_whenIsEquals_thenFalse() {
-        /* assertFalse is used instead assertNotEquals to make
-         * sure that the equals method of the FamilyMember instance
-         * is invoked (not the comparate's). */
-        Assert.assertFalse(familyMember.equals(""));
+        Assert.assertFalse(testFamilyMember.equals(""));
     }
 
     @Test
     public void givenOutdatedFamilyMember_whenIsEquals_thenFalse() {
+        String fullName1 = "Foo Bar";
+        String fullName2 = "Spam Egg";
+        LocalDate birthDate = LocalDate.of(1999, 12, 31);
+        Role role = Role.ORDINARY;
+        String passkey = "1DE7699A91D40069:1000:E8A86EE8A1B866E4C86D609760C385553D9F5AAF";
 
         /* Given an instance with same ID but has different data */
-        blankFamilyMember.setId(familyMember.getId());
+        FamilyMember testFamilyMember1 = new FamilyMember(fullName1, birthDate, role, passkey);
+        testFamilyMember1.setId(1);
+        FamilyMember testFamilyMember2 = new FamilyMember(fullName2, birthDate, role, passkey);
+        testFamilyMember2.setId(1);
 
-        /* assertFalse is used instead assertNotEquals to make
-         * sure that the equals method of the FamilyMember instance
-         * is is invoked (not the comparate's). */
-        Assert.assertFalse(blankFamilyMember.equals(familyMember));
+        /* Then */
+        Assert.assertFalse(testFamilyMember1.equals(testFamilyMember2));
+        Assert.assertFalse(testFamilyMember2.equals(testFamilyMember1));
     }
+
+    /* Notes
+     *
+     * [ASSERTEQUALS] Manual invocation of the equals() methods
+     * is used as the assertEquals() and assertNotEquals() from
+     * Assert do not invoke the equals() which is the object of
+     * test.
+     */
     //endregion
 
 
@@ -149,58 +191,40 @@ public class FamilyMemberTest {
     public void whenInsertToDatabase_thenGetGeneratedId() {
 
         /* When */
-        database.insert(familyMember);
+        database.insert(testFamilyMember);
 
         /* Then */
-        Assert.assertNotEquals(0, familyMember.getId());
+        Assert.assertNotEquals(0, testFamilyMember.getId());
     }
 
     @Test
-    public void givenUpdatedFamilyMember_whenUpdateToDatabase() {
+    public void whenLoadFromDatabase() {
 
         /* Given */
-        database.insert(familyMember);
-
-        String fullName = "Candy Bar";
-        LocalDate birthDate = LocalDate.of(1999,12,30);
-        Role role = Role.ACCOUNTANT;
-        String password = "SpamSpamSpam Egg";
-
-        familyMember.setFullName(fullName);
-        familyMember.setBirthDate(birthDate);
-        familyMember.setRole(role);
-        familyMember.setPassword(password);
+        database.insert(testFamilyMember);
+        int memberId = testFamilyMember.getId();
 
         /* When */
-        database.update(familyMember);
-    }
-
-    @Test
-    public void whenDeleteFromDatabase() {
-
-        /* Given */
-        database.insert(familyMember);
-
-        /* When */
-        int affectedRow = database.delete(familyMember).getRowsAffected();
-
-        /* Then */
-        Assert.assertEquals(1, affectedRow);
-    }
-
-    @Test
-    public void givenMemberId_whenLoadFromDatabase_thenRetreiveSameMember() {
-
-        /* Given */
-        database.insert(familyMember);
-        int memberId = familyMember.getId();
-
-        /* When */
-        Query query = database.where("member_id=?", memberId);
+        Query query = database.table("member").where("member_id=?", memberId);
         FamilyMember retreivedMember = query.first(FamilyMember.class);
 
         /* Then */
-        Assert.assertEquals(familyMember, retreivedMember);
+        /* Note that this assertion depend on the result of
+         * givenSameFamilyMemberButDifferentObjects_whenIsEquals_thenTrue() */
+        Assert.assertEquals(testFamilyMember, retreivedMember);
+    }
+
+    @Test
+    public void whenDeleteInDatabase() {
+
+        /* Given */
+        database.insert(testFamilyMember);
+
+        /* When */
+        int affectedRow = database.delete(testFamilyMember).getRowsAffected();
+
+        /* Then */
+        Assert.assertEquals(1, affectedRow);
     }
     //endregion
 

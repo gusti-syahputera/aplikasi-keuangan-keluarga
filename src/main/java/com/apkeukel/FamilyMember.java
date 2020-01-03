@@ -25,6 +25,15 @@ public class FamilyMember implements Serializable {
 
     //region Constructors
     //==========================================================================
+    public FamilyMember() {}
+
+    public FamilyMember(String fullName, LocalDate birthDate,
+                        Role role, String passkey) {
+        this.setFullName(fullName);
+        this.setBirthDate(birthDate);
+        this.setRole(role);
+        this.setPassKey(passkey);
+    }
     //endregion
 
 
