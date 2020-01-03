@@ -36,8 +36,8 @@ public class FamilyMemberTest {
     public static void databaseSetUp() {
         database = new Database();
         database.setJdbcUrl("jdbc:sqlite:test.db");
-        database.sql("DROP TABLE IF EXISTS member").execute();
-        database.sql(FamilyMember.createTable).execute();
+        database.sql(FamilyMember.dropTableQuery).execute();
+        database.sql(FamilyMember.createTableQuery).execute();
     }
 
     @AfterClass
@@ -205,7 +205,7 @@ public class FamilyMemberTest {
         int memberId = testFamilyMember.getId();
 
         /* When */
-        Query query = database.table("member").where("member_id=?", memberId);
+        Query query = database.table(FamilyMember.tableName).where(FamilyMember.whereKeyClause, memberId);
         FamilyMember retreivedMember = query.first(FamilyMember.class);
 
         /* Then */

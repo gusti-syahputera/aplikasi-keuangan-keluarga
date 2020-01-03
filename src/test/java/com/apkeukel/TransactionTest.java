@@ -29,8 +29,8 @@ public class TransactionTest {
     public static void databaseSetUp() {
         database = new Database();
         database.setJdbcUrl("jdbc:sqlite:test.db");
-        database.sql("DROP TABLE IF EXISTS transaction_").execute();
-        database.sql(Transaction.createTable).execute();
+        database.sql(Transaction.dropTableQuery).execute();
+        database.sql(Transaction.createTableQuery).execute();
     }
 
     @AfterClass
@@ -201,7 +201,7 @@ public class TransactionTest {
         int transactionId = testTransaction.getId();
 
         /* When */
-        Query query = database.table("transaction_").where("tx_id=?", transactionId);
+        Query query = database.table(Transaction.tableName).where(Transaction.whereKeyClause, transactionId);
         Transaction retreivedAccount = query.first(Transaction.class);
 
         /* Then */

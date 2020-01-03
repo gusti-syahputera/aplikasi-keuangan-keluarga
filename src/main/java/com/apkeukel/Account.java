@@ -8,7 +8,7 @@ import java.util.Objects;
 @Table(name="account")
 public class Account implements Serializable {
 
-    public static String createTable =  // copied from definition.sql file
+    public final static String createTableQuery =  // copied from definition.sql file
             "CREATE TABLE IF NOT EXISTS account (\n" +
             "       account_id   INTEGER PRIMARY KEY,\n" +
             "       account_name TEXT    NOT NULL,\n" +
@@ -16,7 +16,9 @@ public class Account implements Serializable {
             "       FOREIGN KEY (owner_id) REFERENCES member(member_id)\n" +
             "         ON DELETE SET NULL\n" +
             ");";
-
+    public final static String dropTableQuery = "DROP TABLE IF EXISTS account;";
+    public final static String tableName = "account";
+    public final static String whereKeyClause = "account_id=?";
 
     //region Constructors
     //==========================================================================

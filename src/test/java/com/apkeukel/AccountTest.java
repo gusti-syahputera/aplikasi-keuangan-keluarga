@@ -27,8 +27,8 @@ public class AccountTest {
     public static void databaseSetUp() {
         database = new Database();
         database.setJdbcUrl("jdbc:sqlite:test.db");
-        database.sql("DROP TABLE IF EXISTS account").execute();
-        database.sql(Account.createTable).execute();
+        database.sql(Account.dropTableQuery).execute();
+        database.sql(Account.createTableQuery).execute();
     }
 
     @AfterClass
@@ -175,7 +175,7 @@ public class AccountTest {
         int accountId = testAccount.getId();
 
         /* When */
-        Query query = database.table("account").where("account_id=?", accountId);
+        Query query = database.table(Account.tableName).where(Account.whereKeyClause, accountId);
         Account retreivedAccount = query.first(Account.class);
 
         /* Then */

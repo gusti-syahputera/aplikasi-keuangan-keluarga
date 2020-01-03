@@ -13,7 +13,7 @@ import java.util.Objects;
 @Table(name="member")
 public class FamilyMember implements Serializable {
 
-    public static String createTable =  // copied from definition.sql file
+    public final static String createTableQuery =  // copied from definition.sql file
             "CREATE TABLE IF NOT EXISTS member (\n" +
             "       member_id  INTEGER PRIMARY KEY,\n" +
             "       full_name  TEXT    NOT NULL,\n" +
@@ -21,7 +21,9 @@ public class FamilyMember implements Serializable {
             "       role       INTEGER DEFAULT 0, -- Enum(ORDINARY, ACCOUNTANT, CHIEF)\n" +
             "       pass_key   TEXT    DEFAULT NULL\n" +
             ");";
-
+    public final static String dropTableQuery = "DROP TABLE IF EXISTS member;";
+    public final static String tableName = "member";
+    public final static String whereKeyClause = "member_id=?";
 
     //region Constructors
     //==========================================================================
