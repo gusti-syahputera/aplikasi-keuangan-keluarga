@@ -1,4 +1,4 @@
-package io.gitlab.gustisyahputera.apkeukel;
+package io.gitlab.gustisyahputera.apkeukel.entitymodel;
 
 import com.dieselpoint.norm.Database;
 import com.dieselpoint.norm.Query;

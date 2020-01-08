@@ -1,4 +1,4 @@
-package io.gitlab.gustisyahputera.apkeukel;
+package io.gitlab.gustisyahputera.apkeukel.entitymodel;
 
 import javax.persistence.*;
 import java.io.Serializable;
