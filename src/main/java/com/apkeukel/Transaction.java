@@ -17,7 +17,7 @@ public class Transaction implements Serializable {
             "       amount      NUMERIC NOT NULL,\n" +
             "       description TEXT,\n" +
             "       FOREIGN KEY (account_id) REFERENCES account(account_id)\n" +
-            "         ON DELETE SET NULL\n" +
+            "         ON DELETE CASCADE\n" +
             ");";
     public final static String dropTableQuery = "DROP TABLE IF EXISTS transaction_;";
     public final static String tableName = "transaction_";

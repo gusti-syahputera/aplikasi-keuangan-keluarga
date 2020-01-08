@@ -12,7 +12,7 @@ public class Account implements Serializable {
             "CREATE TABLE IF NOT EXISTS account (\n" +
             "       account_id   INTEGER PRIMARY KEY,\n" +
             "       account_name TEXT    NOT NULL,\n" +
-            "       owner_id     INTEGER NOT NULL,\n" +
+            "       owner_id     INTEGER,\n" +
             "       FOREIGN KEY (owner_id) REFERENCES member(member_id)\n" +
             "         ON DELETE SET NULL\n" +
             ");";
