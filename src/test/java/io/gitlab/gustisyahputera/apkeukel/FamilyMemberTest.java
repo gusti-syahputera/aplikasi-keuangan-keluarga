@@ -1,4 +1,4 @@
-package com.apkeukel;
+package io.gitlab.gustisyahputera.apkeukel;
 
 import com.dieselpoint.norm.Database;
 import com.dieselpoint.norm.Query;

@@ -1,4 +1,4 @@
-package com.apkeukel;
+package io.gitlab.gustisyahputera.apkeukel;
 
 import javax.persistence.*;
 import java.io.Serializable;

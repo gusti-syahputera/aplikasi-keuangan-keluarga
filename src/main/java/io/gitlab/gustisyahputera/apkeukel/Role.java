@@ -1,4 +1,4 @@
-package com.apkeukel;
+package io.gitlab.gustisyahputera.apkeukel;
 
 
 public enum Role {ORDINARY, ACCOUNTANT, CHIEF}
