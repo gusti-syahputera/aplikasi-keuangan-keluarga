@@ -1,4 +1,4 @@
-package com.apkeukel;
+package io.gitlab.gustisyahputera.apkeukel.entitymodel;
 
 import com.google.inject.Inject;
 import de.rtner.security.auth.spi.SimplePBKDF2;
