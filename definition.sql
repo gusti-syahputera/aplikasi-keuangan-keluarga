@@ -1,5 +1,3 @@
--- SQLite database definition used in the application
-
 CREATE TABLE IF NOT EXISTS member (
        member_id  INTEGER PRIMARY KEY,
        full_name  TEXT    NOT NULL,
@@ -11,7 +9,7 @@ CREATE TABLE IF NOT EXISTS member (
 CREATE TABLE IF NOT EXISTS account (
        account_id   INTEGER PRIMARY KEY,
        account_name TEXT    NOT NULL,
-       owner_id     INTEGER NOT NULL,
+       owner_id     INTEGER,
        FOREIGN KEY (owner_id) REFERENCES member(member_id)
          ON DELETE SET NULL
 );
@@ -23,5 +21,5 @@ CREATE TABLE IF NOT EXISTS transaction_ (
        amount      NUMERIC NOT NULL,
        description TEXT,
        FOREIGN KEY (account_id) REFERENCES account(account_id)
-         ON DELETE SET NULL
+         ON DELETE CASCADE
 );
