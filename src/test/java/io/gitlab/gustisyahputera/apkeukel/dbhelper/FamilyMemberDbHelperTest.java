@@ -14,6 +14,8 @@ public class FamilyMemberDbHelperTest {
 
     private static FamilyMemberDbHelper dbHelper;
 
+    private static List<FamilyMember> testList;
+
 
     //region Setups
     //==========================================================================
@@ -21,7 +23,20 @@ public class FamilyMemberDbHelperTest {
     @BeforeClass
     public static void databaseSetUp() {
         dbHelper = new FamilyMemberDbHelper();
-        dbHelper.setJdbcUrl("jdbc:sqlite:test.db");
+        dbHelper.setJdbcUrl("jdbc:sqlite:FamilyMemberDbHelperTest.db");
+        dbHelper.dropTable();
+        dbHelper.createTable();
+
+        /* Populate testList */
+        String passkey = "1DE7699A91D40069:1000:E8A86EE8A1B866E4C86D609760C385553D9F5AAF";  // does not need to be unique in this case
+        testList = new ArrayList<>();
+        testList.add(new FamilyMember("Foo1", LocalDate.parse("1999-12-31"), Role.CHIEF, passkey));
+        testList.add(new FamilyMember("Foo2", LocalDate.parse("2000-01-31"), Role.ACCOUNTANT, passkey));
+        testList.add(new FamilyMember("Foo3a", LocalDate.parse("2002-01-31"), Role.ORDINARY, passkey));
+        testList.add(new FamilyMember("Foo3b", LocalDate.parse("2002-12-31"), Role.ORDINARY, passkey));
+
+        /* Insert family members in testList into database */
+        testList.forEach(dbHelper::insert);
     }
 
     @AfterClass
@@ -29,30 +44,12 @@ public class FamilyMemberDbHelperTest {
         dbHelper.close();
     }
 
-    @Before
-    public void setUp() {
-        dbHelper.dropTable();
-        dbHelper.createTable();
-    }
-
-    private FamilyMember createSingleFamilyMember() {
-        String fullName = "Foo Bar";
-        LocalDate birthDate = LocalDate.of(1999, 12, 31);
-        Role role = Role.ORDINARY;
-        String passkey = "1DE7699A91D40069:1000:E8A86EE8A1B866E4C86D609760C385553D9F5AAF";
-        return new FamilyMember(fullName, birthDate, role, passkey);
-    }
-
-    private List<FamilyMember> createFamilyMemberList() {
-        String passkey = "1DE7699A91D40069:1000:E8A86EE8A1B866E4C86D609760C385553D9F5AAF";  // does not need to be unique in this case
-
-        List<FamilyMember> newList = new ArrayList<>();
-        newList.add(new FamilyMember("Foo1", LocalDate.parse("1999-12-31"), Role.CHIEF, passkey));
-        newList.add(new FamilyMember("Foo2", LocalDate.parse("2000-01-31"), Role.ACCOUNTANT, passkey));
-        newList.add(new FamilyMember("Foo3a", LocalDate.parse("2002-01-31"), Role.ORDINARY, passkey));
-        newList.add(new FamilyMember("Foo3b", LocalDate.parse("2002-12-31"), Role.ORDINARY, passkey));
-
-        return newList;
+    /** Assert that retreivedList contains all expected testList's elements */
+    private void assertResultMatchs(List<FamilyMember> retreivedList, int... expectedIndices) {
+        Assert.assertEquals(expectedIndices.length, retreivedList.size());
+        for (int i = 0; i < expectedIndices.length; i++) {
+            Assert.assertEquals(testList.get(expectedIndices[i]), retreivedList.get(i));  // see [ASSERTEQUALS]
+        }
     }
     //endregion
 
@@ -61,22 +58,10 @@ public class FamilyMemberDbHelperTest {
     //==========================================================================
 
     @Test
-    public void whenInsertToDatabase_thenGetGeneratedId() {
-        FamilyMember testFamilyMember = createSingleFamilyMember();
-
-        /* When */
-        dbHelper.insert(testFamilyMember);
-
-        /* Then */
-        Assert.assertNotEquals(0, testFamilyMember.getId());
-    }
-
-    @Test
     public void whenLoadFromDatabase() {
-        FamilyMember testFamilyMember = createSingleFamilyMember();
 
         /* Given */
-        dbHelper.insert(testFamilyMember);
+        FamilyMember testFamilyMember = testList.get(0);
         int memberId = testFamilyMember.getId();
 
         /* When */
@@ -84,23 +69,7 @@ public class FamilyMemberDbHelperTest {
         FamilyMember retreivedMember = query.first(FamilyMember.class);
 
         /* Then */
-        /* Note that this assertion depend on the result of
-         * FamilyMemberTest.givenSameFamilyMemberButDifferentObjects_whenIsEquals_thenTrue() */
-        Assert.assertEquals(testFamilyMember, retreivedMember);
-    }
-
-    @Test
-    public void whenDeleteInDatabase() {
-        FamilyMember testFamilyMember = createSingleFamilyMember();
-
-        /* Given */
-        dbHelper.insert(testFamilyMember);
-
-        /* When */
-        int affectedRow = dbHelper.delete(testFamilyMember).getRowsAffected();
-
-        /* Then */
-        Assert.assertEquals(1, affectedRow);
+        Assert.assertEquals(testFamilyMember, retreivedMember);  // see [ASSERTEQUALS]
     }
     //endregion
 
@@ -109,36 +78,26 @@ public class FamilyMemberDbHelperTest {
     //==========================================================================
 
     @Test
-    public void whenDropTable() {
-        dbHelper.dropTable();
-    }
-
-    @Test
-    public void whenCreateTable() {
-        dbHelper.createTable();
-    }
-
-    @Test
     public void whenGetFamilyMember_thenRetreiveFromDatabase() {
-        FamilyMember testFamilyMember = createSingleFamilyMember();
 
         /* Given */
-        dbHelper.insert(testFamilyMember);
+        FamilyMember testFamilyMember = testList.get(0);
         int memberId = testFamilyMember.getId();
 
         /* When */
         FamilyMember retreivedMember = dbHelper.getFamilyMember(memberId);
 
         /* Then */
-        /* Note that this assertion depend on the result of
-         * FamilyMemberTest.givenSameFamilyMemberButDifferentObjects_whenIsEquals_thenTrue() */
-        Assert.assertEquals(testFamilyMember, retreivedMember);
+        Assert.assertEquals(testFamilyMember, retreivedMember);  // see [ASSERTEQUALS]
     }
+    //endregion
+
+
+    //region Search tests
+    //==========================================================================
 
     @Test
     public void givenName_whenSearchFamilyMember() {
-        List<FamilyMember> testList = createFamilyMemberList();
-        testList.forEach(dbHelper::insert);
 
         /* Given */
         String name = "Foo3%";
@@ -147,13 +106,11 @@ public class FamilyMemberDbHelperTest {
         List<FamilyMember> retreivedList = dbHelper.searchFamilyMember(name, null, null, null);
 
         /* Then */
-        Assert.assertEquals(2, retreivedList.size());  // 2, 3
+        assertResultMatchs(retreivedList, 2, 3);
     }
 
     @Test
     public void givenStartBod_whenSearchFamilyMember() {
-        List<FamilyMember> testList = createFamilyMemberList();
-        testList.forEach(dbHelper::insert);
 
         /* Given */
         LocalDate startBod = testList.get(1).getBirthDate();
@@ -162,13 +119,11 @@ public class FamilyMemberDbHelperTest {
         List<FamilyMember> retreivedList = dbHelper.searchFamilyMember(null, startBod, null, null);
 
         /* Then */
-        Assert.assertEquals(3, retreivedList.size());  // 1, 2, 3
+        assertResultMatchs(retreivedList, 1, 2, 3);
     }
 
     @Test
     public void givenEndBod_whenSearchFamilyMember() {
-        List<FamilyMember> testList = createFamilyMemberList();
-        testList.forEach(dbHelper::insert);
 
         /* Given */
         LocalDate endBod = testList.get(2).getBirthDate();
@@ -177,13 +132,11 @@ public class FamilyMemberDbHelperTest {
         List<FamilyMember> retreivedList = dbHelper.searchFamilyMember(null, null, endBod, null);
 
         /* Then */
-        Assert.assertEquals(3, retreivedList.size());  // 0, 1, 2
+        assertResultMatchs(retreivedList, 0, 1, 2);
     }
 
     @Test
     public void givenRole_whenSearchFamilyMember() {
-        List<FamilyMember> testList = createFamilyMemberList();
-        testList.forEach(dbHelper::insert);
 
         /* Given */
         Role role = Role.ORDINARY;
@@ -192,8 +145,14 @@ public class FamilyMemberDbHelperTest {
         List<FamilyMember> retreivedList = dbHelper.searchFamilyMember(null, null, null, role);
 
         /* Then */
-        Assert.assertEquals(2, retreivedList.size());  // 2, 3
+        assertResultMatchs(retreivedList, 2, 3);
     }
     //endregion
 
+    /*
+     * Notes
+     *
+     * [ASSERTEQUALS] assertEquals depend on the result of FamilyMemberTest
+     * .givenSameFamilyMemberButDifferentObjects_whenIsEquals_thenTrue()
+     */
 }
