@@ -156,10 +156,10 @@ public class AccountDbHelperTest {
         int[] ownerIds = {};
 
         /* When */
-        List<Account> retreivedList = dbHelper.searchAccount("control param", ownerIds);
+        List<Account> retreivedList = dbHelper.searchAccount("Family%", ownerIds);
 
         /* Then */
-        Assert.assertEquals(0, retreivedList.size());
+        Assert.assertEquals(2, retreivedList.size());
     }
 
     @Test
