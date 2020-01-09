@@ -1,7 +1,5 @@
 package io.gitlab.gustisyahputera.apkeukel.entitymodel;
 
-import com.dieselpoint.norm.Database;
-import com.dieselpoint.norm.Query;
 import de.rtner.security.auth.spi.SimplePBKDF2;
 import org.junit.*;
 import org.junit.runner.RunWith;
@@ -26,24 +24,9 @@ public class FamilyMemberTest {
 
     private FamilyMember testFamilyMember;
 
-    private static Database database;
-
 
     //region Setups
     //==========================================================================
-
-    @BeforeClass
-    public static void databaseSetUp() {
-        database = new Database();
-        database.setJdbcUrl("jdbc:sqlite:test.db");
-        database.sql(FamilyMember.dropTableQuery).execute();
-        database.sql(FamilyMember.createTableQuery).execute();
-    }
-
-    @AfterClass
-    public static void databaseTearDown() {
-        database.close();
-    }
 
     @Before
     public void setUp() {
@@ -183,49 +166,5 @@ public class FamilyMemberTest {
      */
     //endregion
 
-
-    //region Persistency tests
-    //==========================================================================
-
-    @Test
-    public void whenInsertToDatabase_thenGetGeneratedId() {
-
-        /* When */
-        database.insert(testFamilyMember);
-
-        /* Then */
-        Assert.assertNotEquals(0, testFamilyMember.getId());
-    }
-
-    @Test
-    public void whenLoadFromDatabase() {
-
-        /* Given */
-        database.insert(testFamilyMember);
-        int memberId = testFamilyMember.getId();
-
-        /* When */
-        Query query = database.table(FamilyMember.tableName).where(FamilyMember.whereKeyClause, memberId);
-        FamilyMember retreivedMember = query.first(FamilyMember.class);
-
-        /* Then */
-        /* Note that this assertion depend on the result of
-         * givenSameFamilyMemberButDifferentObjects_whenIsEquals_thenTrue() */
-        Assert.assertEquals(testFamilyMember, retreivedMember);
-    }
-
-    @Test
-    public void whenDeleteInDatabase() {
-
-        /* Given */
-        database.insert(testFamilyMember);
-
-        /* When */
-        int affectedRow = database.delete(testFamilyMember).getRowsAffected();
-
-        /* Then */
-        Assert.assertEquals(1, affectedRow);
-    }
-    //endregion
 
 }

@@ -1,7 +1,5 @@
 package io.gitlab.gustisyahputera.apkeukel.entitymodel;
 
-import com.dieselpoint.norm.Database;
-import com.dieselpoint.norm.Query;
 import org.junit.*;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
@@ -16,25 +14,11 @@ public class AccountTest {
     @Mock
     private FamilyMember familyMember = new FamilyMember();
 
-    private static Database database;
     private Account testAccount;
 
 
     //region Setups
     //==========================================================================
-
-    @BeforeClass
-    public static void databaseSetUp() {
-        database = new Database();
-        database.setJdbcUrl("jdbc:sqlite:test.db");
-        database.sql(Account.dropTableQuery).execute();
-        database.sql(Account.createTableQuery).execute();
-    }
-
-    @AfterClass
-    public static void databaseTearDown() {
-        database.close();
-    }
 
     @Before
     public void setUp() {
@@ -151,51 +135,6 @@ public class AccountTest {
      * Assert do not invoke the equals() which is the object of
      * test.
      */
-    //endregion
-
-
-    //region Persistency tests
-    //==========================================================================
-
-    @Test
-    public void whenInsertToDatabase_thenGetGeneratedId() {
-
-        /* When */
-        database.insert(testAccount);
-
-        /* Then */
-        Assert.assertNotEquals(0, testAccount.getId());
-    }
-
-    @Test
-    public void whenLoadFromDatabase() {
-
-        /* Given */
-        database.insert(testAccount);
-        int accountId = testAccount.getId();
-
-        /* When */
-        Query query = database.table(Account.tableName).where(Account.whereKeyClause, accountId);
-        Account retreivedAccount = query.first(Account.class);
-
-        /* Then */
-        /* Note that this assertion depend on the result of
-         * givenSameAccountButDifferentObjects_whenIsEquals_thenTrue() */
-        Assert.assertEquals(testAccount, retreivedAccount);
-    }
-
-    @Test
-    public void whenDeleteInDatabase() {
-
-        /* Given */
-        database.insert(testAccount);
-
-        /* When */
-        int affectedRow = database.delete(testAccount).getRowsAffected();
-
-        /* Then */
-        Assert.assertEquals(1, affectedRow);
-    }
     //endregion
 
 }
