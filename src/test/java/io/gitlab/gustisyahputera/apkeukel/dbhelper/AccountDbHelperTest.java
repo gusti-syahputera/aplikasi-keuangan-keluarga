@@ -137,7 +137,7 @@ public class AccountDbHelperTest {
         String name = "%school%";
 
         /* When */
-        List<Account> retreivedList = dbHelper.searchAccount(name, (Integer) null);
+        List<Account> retreivedList = dbHelper.searchAccount(name, null);
 
         /* Then */
         Assert.assertEquals(2, retreivedList.size());  // 2, 3
@@ -148,25 +148,22 @@ public class AccountDbHelperTest {
     }
 
     @Test
-    public void givenOwnerId_whenSearchAccount() {
+    public void givenEmptyOwnerIds_whenSearchAccount() {
         List<Account> testList = createAccountList();
         testList.forEach(dbHelper::insert);
 
         /* Given */
-        int ownerId = 1;
+        int[] ownerIds = {};
 
         /* When */
-        List<Account> retreivedList = dbHelper.searchAccount(null, ownerId);
+        List<Account> retreivedList = dbHelper.searchAccount("control param", ownerIds);
 
         /* Then */
-        Assert.assertEquals(1, retreivedList.size());  // 0
-        /* Note that this assertion depend on the result of
-         * AccountTest.givenSameAccountButDifferentObjects_whenIsEquals_thenTrue() */
-        Assert.assertEquals(retreivedList.get(0), testList.get(0));
+        Assert.assertEquals(0, retreivedList.size());
     }
 
     @Test
-    public void givenMultipleOwnerIds_whenSearchAccount() {
+    public void givenOwnerIds_whenSearchAccount() {
         List<Account> testList = createAccountList();
         testList.forEach(dbHelper::insert);
 

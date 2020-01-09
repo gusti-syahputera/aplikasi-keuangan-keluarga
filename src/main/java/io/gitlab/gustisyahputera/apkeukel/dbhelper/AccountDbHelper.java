@@ -30,30 +30,24 @@ public class AccountDbHelper extends Database implements DbHelper {
         return query.first(Account.class);
     }
 
-    public List<Account> searchAccount(String name, Integer ownerId) {
-        Query query = this.where(
-                "(? IS NULL OR account_name LIKE ?)\n" +
-                        "AND (? IS NULL OR owner_id = ?)",
-                name, name, ownerId, ownerId
-        );
-        return query.results(Account.class);
+    private String prepareMultipleOwnerIdsWhereStatement(int[] ownerIds) {
+        String statement = "(? IS NULL OR account_name LIKE ?)\n";
+
+        /* Generates comma separated string of the array if it's not empty */
+        if (ownerIds != null && ownerIds.length != 0) {
+            String ownerIdsList = Arrays
+                    .stream(ownerIds)
+                    .mapToObj(String::valueOf)
+                    .reduce((a, b) -> a.concat(",").concat(b))
+                    .get();
+            statement += "AND owner_id IN (#)";
+            statement = statement.replace("#", ownerIdsList);
+        }
+
+        return statement;
     }
 
-    private String prepareMultipleOwnerIdsWhereStatement(int... ownerIds) {
-
-        /* Generates comma separated string of the array */
-        String ownerIdsList = Arrays
-                .stream(ownerIds)
-                .mapToObj(String::valueOf)
-                .reduce((a, b) -> a.concat(",").concat(b))
-                .get();
-
-        String statement = "(? IS NULL OR account_name LIKE ?)\n" +
-                           "AND owner_id IN (#)";
-        return statement.replace("#", ownerIdsList);
-    }
-
-    public List<Account> searchAccount(String name, int... ownerIds) {
+    public List<Account> searchAccount(String name, int[] ownerIds) {
         Query query = this.where(
                 prepareMultipleOwnerIdsWhereStatement(ownerIds),
                 name, name
