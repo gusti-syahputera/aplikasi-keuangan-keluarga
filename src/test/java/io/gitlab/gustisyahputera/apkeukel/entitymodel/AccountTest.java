@@ -1,7 +1,5 @@
 package io.gitlab.gustisyahputera.apkeukel.entitymodel;
 
-import com.dieselpoint.norm.Database;
-import com.dieselpoint.norm.Query;
 import org.junit.*;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
@@ -16,25 +14,11 @@ public class AccountTest {
     @Mock
     private FamilyMember familyMember = new FamilyMember();
 
-    private static Database database;
     private Account testAccount;
 
 
     //region Setups
     //==========================================================================
-
-    @BeforeClass
-    public static void databaseSetUp() {
-        database = new Database();
-        database.setJdbcUrl("jdbc:sqlite:test.db");
-        database.sql(Account.dropTableQuery).execute();
-        database.sql(Account.createTableQuery).execute();
-    }
-
-    @AfterClass
-    public static void databaseTearDown() {
-        database.close();
-    }
 
     @Before
     public void setUp() {
