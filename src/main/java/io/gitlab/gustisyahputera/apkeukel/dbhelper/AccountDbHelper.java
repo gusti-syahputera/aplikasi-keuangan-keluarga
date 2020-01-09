@@ -4,10 +4,8 @@ import com.dieselpoint.norm.Database;
 import com.dieselpoint.norm.Query;
 import io.gitlab.gustisyahputera.apkeukel.entitymodel.Account;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.IntStream;
 
 
 public class AccountDbHelper extends Database implements DbHelper {
