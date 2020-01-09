@@ -41,6 +41,13 @@ public class TransactionDbHelperTest {
     public static void databaseTearDown() {
         dbHelper.close();
     }
+
+    private void assertResultMatchs(List<Transaction> retreivedList, int... expectedIndices) {
+        Assert.assertEquals(expectedIndices.length, retreivedList.size());
+        for (int i = 0; i < expectedIndices.length; i++) {
+            Assert.assertEquals(testList.get(expectedIndices[i]), retreivedList.get(i));  // see [ASSERTEQUALS]
+        }
+    }
     //endregion
 
 
@@ -96,8 +103,7 @@ public class TransactionDbHelperTest {
         List<Transaction> retreivedList = dbHelper.searchTransaction(accountIds, Integer.MIN_VALUE, null, null, null, null);
 
         /* Then */
-        int[] expectedIndices = {0, 1, 2, 3};  //all
-        Assert.assertEquals(expectedIndices.length, retreivedList.size());
+        assertResultMatchs(retreivedList, 0, 1, 2, 3);
     }
 
     @Test
@@ -110,11 +116,7 @@ public class TransactionDbHelperTest {
         List<Transaction> retreivedList = dbHelper.searchTransaction(accountIds, null, null, null, null, null);
 
         /* Then */
-        int[] expectedIndices = {0, 1, 2};
-        Assert.assertEquals(expectedIndices.length, retreivedList.size());
-        for (int i = 0; i < expectedIndices.length; i++) {
-            Assert.assertEquals(testList.get(expectedIndices[i]), retreivedList.get(i));  // see [ASSERTEQUALS]
-        }
+        assertResultMatchs(retreivedList, 0, 1, 2);
     }
 
     @Test
@@ -128,11 +130,7 @@ public class TransactionDbHelperTest {
                 .searchTransaction(null, lowerAmount, null, null, null, null);
 
         /* Then */
-        int[] expectedIndices = {0, 2, 3};
-        Assert.assertEquals(expectedIndices.length, retreivedList.size());
-        for (int i = 0; i < expectedIndices.length; i++) {
-            Assert.assertEquals(testList.get(expectedIndices[i]), retreivedList.get(i));  // see [ASSERTEQUALS]
-        }
+        assertResultMatchs(retreivedList, 0, 2, 3);
     }
 
     @Test
@@ -146,11 +144,7 @@ public class TransactionDbHelperTest {
                 .searchTransaction(null, null, upperAmount, null, null, null);
 
         /* Then */
-        int[] expectedIndices = {1, 2, 3};
-        Assert.assertEquals(expectedIndices.length, retreivedList.size());
-        for (int i = 0; i < expectedIndices.length; i++) {
-            Assert.assertEquals(testList.get(expectedIndices[i]), retreivedList.get(i));  // see [ASSERTEQUALS]
-        }
+        assertResultMatchs(retreivedList, 1, 2, 3);
     }
 
     @Test
@@ -164,11 +158,7 @@ public class TransactionDbHelperTest {
                 .searchTransaction(null, null, null, startDate, null, null);
 
         /* Then */
-        int[] expectedIndices = {1, 3};
-        Assert.assertEquals(expectedIndices.length, retreivedList.size());
-        for (int i = 0; i < expectedIndices.length; i++) {
-            Assert.assertEquals(testList.get(expectedIndices[i]), retreivedList.get(i));  // see [ASSERTEQUALS]
-        }
+        assertResultMatchs(retreivedList, 1, 3);
     }
 
     @Test
@@ -182,11 +172,7 @@ public class TransactionDbHelperTest {
                 .searchTransaction(null, null, null, null, endDate, null);
 
         /* Then */
-        int[] expectedIndices = {0, 1, 2};
-        Assert.assertEquals(expectedIndices.length, retreivedList.size());
-        for (int i = 0; i < expectedIndices.length; i++) {
-            Assert.assertEquals(testList.get(expectedIndices[i]), retreivedList.get(i));  // see [ASSERTEQUALS]
-        }
+        assertResultMatchs(retreivedList, 0, 1, 2);
     }
 
     @Test
@@ -200,11 +186,7 @@ public class TransactionDbHelperTest {
                 .searchTransaction(null, null, null, null, null, description);
 
         /* Then */
-        int[] expectedIndices = {0, 2, 3};
-        Assert.assertEquals(expectedIndices.length, retreivedList.size());
-        for (int i = 0; i < expectedIndices.length; i++) {
-            Assert.assertEquals(testList.get(expectedIndices[i]), retreivedList.get(i));  // see [ASSERTEQUALS]
-        }
+        assertResultMatchs(retreivedList, 0, 2, 3);
     }
     //endregion
 
