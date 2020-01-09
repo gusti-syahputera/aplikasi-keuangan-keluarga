@@ -1,6 +1,5 @@
 package io.gitlab.gustisyahputera.apkeukel.dbhelper;
 
-
 import com.dieselpoint.norm.Query;
 import io.gitlab.gustisyahputera.apkeukel.entitymodel.Account;
 import org.junit.*;
@@ -13,6 +12,8 @@ public class AccountDbHelperTest {
 
     private static AccountDbHelper dbHelper;
 
+    private static List<Account> testList;
+
 
     //region Setups
     //==========================================================================
@@ -20,7 +21,19 @@ public class AccountDbHelperTest {
     @BeforeClass
     public static void databaseSetUp() {
         dbHelper = new AccountDbHelper();
-        dbHelper.setJdbcUrl("jdbc:sqlite:test.db");
+        dbHelper.setJdbcUrl("jdbc:sqlite:AccountDbHelperTest.db");
+        dbHelper.dropTable();
+        dbHelper.createTable();
+
+        /* Populate testList */
+        testList = new ArrayList<>();
+        testList.add(new Account("Family income", 1));
+        testList.add(new Account("Family saving", 2));
+        testList.add(new Account("School tuition", 3));
+        testList.add(new Account("School tuition", 4));
+
+        /* Insert accounts in testList into database */
+        testList.forEach(dbHelper::insert);
     }
 
     @AfterClass
@@ -28,48 +41,24 @@ public class AccountDbHelperTest {
         dbHelper.close();
     }
 
-    @Before
-    public void setUp() {
-        dbHelper.dropTable();
-        dbHelper.createTable();
-    }
-
-    private Account createSingleAccount() {
-        return new Account("General account", 1);
-    }
-
-    private List<Account> createAccountList() {
-        List<Account> newList = new ArrayList<>();
-        newList.add(new Account("Family income", 1));
-        newList.add(new Account("Family saving", 2));
-        newList.add(new Account("School tuition", 3));
-        newList.add(new Account("School tuition", 4));
-
-        return newList;
+    /** Assert that retreivedList contains all expected testList's elements */
+    private void assertResultMatchs(List<Account> retreivedList, int... expectedIndices) {
+        Assert.assertEquals(expectedIndices.length, retreivedList.size());
+        for (int i = 0; i < expectedIndices.length; i++) {
+            Assert.assertEquals(testList.get(expectedIndices[i]), retreivedList.get(i));  // see [ASSERTEQUALS]
+        }
     }
     //endregion
 
 
-    //region Persistency tests
+    //region Persistency test
     //==========================================================================
 
     @Test
-    public void whenInsertToDatabase_thenGetGeneratedId() {
-        Account testAccount = createSingleAccount();
-
-        /* When */
-        dbHelper.insert(testAccount);
-
-        /* Then */
-        Assert.assertNotEquals(0, testAccount.getId());
-    }
-
-    @Test
     public void whenLoadFromDatabase() {
-        Account testAccount = createSingleAccount();
 
         /* Given */
-        dbHelper.insert(testAccount);
+        Account testAccount = testList.get(0);
         int accountId = testAccount.getId();
 
         /* When */
@@ -77,23 +66,7 @@ public class AccountDbHelperTest {
         Account retreivedAccount = query.first(Account.class);
 
         /* Then */
-        /* Note that this assertion depend on the result of
-         * AccountTest.givenSameAccountButDifferentObjects_whenIsEquals_thenTrue() */
-        Assert.assertEquals(testAccount, retreivedAccount);
-    }
-
-    @Test
-    public void whenDeleteInDatabase() {
-        Account testAccount = createSingleAccount();
-
-        /* Given */
-        dbHelper.insert(testAccount);
-
-        /* When */
-        int affectedRow = dbHelper.delete(testAccount).getRowsAffected();
-
-        /* Then */
-        Assert.assertEquals(1, affectedRow);
+        Assert.assertEquals(testAccount, retreivedAccount);  // see [ASSERTEQUALS]
     }
     //endregion
 
@@ -102,36 +75,26 @@ public class AccountDbHelperTest {
     //==========================================================================
 
     @Test
-    public void whenDropTable() {
-        dbHelper.dropTable();
-    }
-
-    @Test
-    public void whenCreateTable() {
-        dbHelper.createTable();
-    }
-
-    @Test
     public void whenGetAccount_thenRetreiveFromDatabase() {
-        Account testAccount = createSingleAccount();
 
         /* Given */
-        dbHelper.insert(testAccount);
+        Account testAccount = testList.get(0);
         int accountId = testAccount.getId();
 
         /* When */
         Account retreivedAccount = dbHelper.getAccount(accountId);
 
         /* Then */
-        /* Note that this assertion depend on the result of
-         * AccountTest.givenSameAccountButDifferentObjects_whenIsEquals_thenTrue() */
-        Assert.assertEquals(testAccount, retreivedAccount);
+        Assert.assertEquals(testAccount, retreivedAccount);  // see [ASSERTEQUALS]
     }
+    //endregion
+
+
+    //region Search tests
+    //==========================================================================
 
     @Test
     public void givenAccountName_whenSearchAccount() {
-        List<Account> testList = createAccountList();
-        testList.forEach(dbHelper::insert);
 
         /* Given */
         String name = "%school%";
@@ -140,17 +103,11 @@ public class AccountDbHelperTest {
         List<Account> retreivedList = dbHelper.searchAccount(name, null);
 
         /* Then */
-        Assert.assertEquals(2, retreivedList.size());  // 2, 3
-        /* Note that this assertion depend on the result of
-         * AccountTest.givenSameAccountButDifferentObjects_whenIsEquals_thenTrue() */
-        Assert.assertEquals(retreivedList.get(0), testList.get(2));
-        Assert.assertEquals(retreivedList.get(1), testList.get(3));
+        assertResultMatchs(retreivedList, 2, 3);
     }
 
     @Test
     public void givenEmptyOwnerIds_whenSearchAccount() {
-        List<Account> testList = createAccountList();
-        testList.forEach(dbHelper::insert);
 
         /* Given */
         int[] ownerIds = {};
@@ -159,13 +116,11 @@ public class AccountDbHelperTest {
         List<Account> retreivedList = dbHelper.searchAccount("Family%", ownerIds);
 
         /* Then */
-        Assert.assertEquals(2, retreivedList.size());
+        assertResultMatchs(retreivedList, 0, 1);
     }
 
     @Test
     public void givenOwnerIds_whenSearchAccount() {
-        List<Account> testList = createAccountList();
-        testList.forEach(dbHelper::insert);
 
         /* Given */
         int[] ownerIds = {1, 4, 5};
@@ -174,12 +129,14 @@ public class AccountDbHelperTest {
         List<Account> retreivedList = dbHelper.searchAccount(null, ownerIds);
 
         /* Then */
-        Assert.assertEquals(2, retreivedList.size());  // 0, 3
-        /* Note that this assertion depend on the result of
-         * AccountTest.givenSameAccountButDifferentObjects_whenIsEquals_thenTrue() */
-        Assert.assertEquals(retreivedList.get(0), testList.get(0));
-        Assert.assertEquals(retreivedList.get(1), testList.get(3));
+        assertResultMatchs(retreivedList, 0, 3);
     }
     //endregion
 
+    /*
+     * Notes
+     *
+     * [ASSERTEQUALS] assertEquals depend on the result of AccountTest
+     * .givenSameAccountButDifferentObjects_whenIsEquals_thenTrue()
+     */
 }
