@@ -1,7 +1,5 @@
 package io.gitlab.gustisyahputera.apkeukel.entitymodel;
 
-import com.dieselpoint.norm.Database;
-import com.dieselpoint.norm.Query;
 import org.junit.*;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
@@ -18,25 +16,11 @@ public class TransactionTest {
     @Mock
     private Account mockAccount = new Account();
 
-    private static Database database;
     private Transaction testTransaction;
 
 
     //region Setups
     //==========================================================================
-
-    @BeforeClass
-    public static void databaseSetUp() {
-        database = new Database();
-        database.setJdbcUrl("jdbc:sqlite:test.db");
-        database.sql(Transaction.dropTableQuery).execute();
-        database.sql(Transaction.createTableQuery).execute();
-    }
-
-    @AfterClass
-    public static void databaseTearDown() {
-        database.close();
-    }
 
     @Before
     public void setUp() {
@@ -180,48 +164,6 @@ public class TransactionTest {
     //endregion
 
 
-    //region Persistency tests
-    //==========================================================================
 
-    @Test
-    public void whenInsertToDatabase_thenGetGeneratedId() {
-
-        /* When */
-        database.insert(testTransaction);
-
-        /* Then */
-        Assert.assertNotEquals(0, testTransaction.getId());
-    }
-
-    @Test
-    public void whenLoadFromDatabase() {
-
-        /* Given */
-        database.insert(testTransaction);
-        int transactionId = testTransaction.getId();
-
-        /* When */
-        Query query = database.table(Transaction.tableName).where(Transaction.whereKeyClause, transactionId);
-        Transaction retreivedAccount = query.first(Transaction.class);
-
-        /* Then */
-        /* Note that this assertion depend on the result of
-         * givenSameTransactionButDifferentObjects_whenIsEquals_thenTrue() */
-        Assert.assertEquals(testTransaction, retreivedAccount);
-    }
-
-    @Test
-    public void whenDeleteInDatabase() {
-
-        /* Given */
-        database.insert(testTransaction);
-
-        /* When */
-        int affectedRow = database.delete(testTransaction).getRowsAffected();
-
-        /* Then */
-        Assert.assertEquals(1, affectedRow);
-    }
-    //endregion
 
 }
