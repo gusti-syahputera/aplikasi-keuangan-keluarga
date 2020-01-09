@@ -153,49 +153,4 @@ public class AccountTest {
      */
     //endregion
 
-
-    //region Persistency tests
-    //==========================================================================
-
-    @Test
-    public void whenInsertToDatabase_thenGetGeneratedId() {
-
-        /* When */
-        database.insert(testAccount);
-
-        /* Then */
-        Assert.assertNotEquals(0, testAccount.getId());
-    }
-
-    @Test
-    public void whenLoadFromDatabase() {
-
-        /* Given */
-        database.insert(testAccount);
-        int accountId = testAccount.getId();
-
-        /* When */
-        Query query = database.table(Account.tableName).where(Account.whereKeyClause, accountId);
-        Account retreivedAccount = query.first(Account.class);
-
-        /* Then */
-        /* Note that this assertion depend on the result of
-         * givenSameAccountButDifferentObjects_whenIsEquals_thenTrue() */
-        Assert.assertEquals(testAccount, retreivedAccount);
-    }
-
-    @Test
-    public void whenDeleteInDatabase() {
-
-        /* Given */
-        database.insert(testAccount);
-
-        /* When */
-        int affectedRow = database.delete(testAccount).getRowsAffected();
-
-        /* Then */
-        Assert.assertEquals(1, affectedRow);
-    }
-    //endregion
-
 }
