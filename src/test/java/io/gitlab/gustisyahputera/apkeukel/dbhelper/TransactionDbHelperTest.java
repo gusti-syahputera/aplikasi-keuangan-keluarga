@@ -100,7 +100,7 @@ public class TransactionDbHelperTest {
         int[] accountIds = {};
 
         /* When */
-        List<Transaction> retreivedList = dbHelper.searchTransaction(accountIds, Integer.MIN_VALUE, null, null, null, null);
+        List<Transaction> retreivedList = dbHelper.searchTransaction(accountIds, null, null, null, null, null);
 
         /* Then */
         assertResultMatchs(retreivedList, 0, 1, 2, 3);
@@ -123,7 +123,7 @@ public class TransactionDbHelperTest {
     public void givenLowerAmount_whenSearchAccount() {
 
         /* Given */
-        int lowerAmount = 700;
+        double lowerAmount = 700;
 
         /* When */
         List<Transaction> retreivedList = dbHelper
@@ -137,7 +137,7 @@ public class TransactionDbHelperTest {
     public void givenUpperAmount_whenSearchAccount() {
 
         /* Given */
-        int upperAmount = 900;
+        double upperAmount = 900;
 
         /* When */
         List<Transaction> retreivedList = dbHelper
@@ -187,6 +187,39 @@ public class TransactionDbHelperTest {
 
         /* Then */
         assertResultMatchs(retreivedList, 0, 2, 3);
+    }
+
+    @Test
+    public void givenOrderingParameters_whenSearchAccount() {
+
+        /* Given */
+        String orderBy = Transaction.transactionIdColumn;
+        boolean ascendingOrder = false;
+
+        /* When */
+        List<Transaction> retreivedList = dbHelper
+                .searchTransaction(null, null, null, null, null, null,
+                                   orderBy, ascendingOrder);
+
+        /* Then */
+        assertResultMatchs(retreivedList, 3, 2, 1, 0);
+    }
+
+    @Test
+    public void givenPaginationParameters_whenSearchAccount() {
+
+        /* Given */
+        String orderBy = Transaction.descriptionColumn;
+        String offset = testList.get(0).getDescription();  // offset is exclusive
+        int limit = 10;
+
+        /* When */
+        List<Transaction> retreivedList = dbHelper
+                .searchTransaction(null, null, null, null, null, null,
+                                   orderBy, true, offset, limit);
+
+        /* Then */
+        assertResultMatchs(retreivedList, 2, 3);
     }
     //endregion
 

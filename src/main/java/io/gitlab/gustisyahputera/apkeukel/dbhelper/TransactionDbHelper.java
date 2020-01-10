@@ -5,7 +5,6 @@ import com.dieselpoint.norm.Query;
 import io.gitlab.gustisyahputera.apkeukel.entitymodel.Transaction;
 
 import java.time.LocalDate;
-import java.util.Arrays;
 import java.util.List;
 
 
@@ -31,38 +30,63 @@ public class TransactionDbHelper extends Database implements DbHelper {
         return query.first(Transaction.class);
     }
 
-    private String prepareMultipleAccountIdsWhereStatement(int[] accountIds) {
-        String statement = "(? IS NULL OR description LIKE ?)\n" +
-                           "AND (? IS NULL OR date_ >= ?)\n" +
-                           "AND (? IS NULL OR date_ <= ?)\n" +
-                           "AND (? IS NULL OR amount >= ?)\n" +
-                           "AND (? IS NULL OR amount <= ?)\n";
-
-        /* Generates comma separated string of the array if it's not empty */
-        if (accountIds != null && accountIds.length != 0) {
-            String accountIdsList = Arrays
-                    .stream(accountIds)
-                    .mapToObj(String::valueOf)
-                    .reduce((a, b) -> a.concat(",").concat(b))
-                    .get();
-            statement += "AND account_id IN (#)";
-            statement = statement.replace("#", accountIdsList);
-        }
-
-        return statement;
+    public List<Transaction> searchTransaction(int[] accountIds,
+                                               Double lowerAmount,
+                                               Double upperAmount,
+                                               LocalDate startDate,
+                                               LocalDate endDate,
+                                               String description) {
+        return searchTransaction(accountIds, lowerAmount, upperAmount, startDate, endDate, description,
+                                 Transaction.transactionIdColumn, true);
     }
 
-    public List<Transaction> searchTransaction(int[] accountId,
-                                               Integer lowerAmount, Integer upperAmount,
-                                               LocalDate startDate, LocalDate endDate,
-                                               String description) {
-        Query query = this.where(
-                prepareMultipleAccountIdsWhereStatement(accountId),
+    /** Search Transaction with ordering parameters */
+    public List<Transaction> searchTransaction(int[] accountIds,
+                                               Double lowerAmount,
+                                               Double upperAmount,
+                                               LocalDate startDate,
+                                               LocalDate endDate,
+                                               String description,
+                                               String orderBy,
+                                               boolean ascendingOrder) {
+        return searchTransaction(accountIds, lowerAmount, upperAmount, startDate, endDate, description,
+                                 orderBy, ascendingOrder, 0, Integer.MAX_VALUE);
+    }
+
+    /** Search Transaction with ordering and pagination parameters */
+    public List<Transaction> searchTransaction(int[] accountIds,
+                                               Double lowerAmount,
+                                               Double upperAmount,
+                                               LocalDate startDate,
+                                               LocalDate endDate,
+                                               String description,
+                                               String orderBy,
+                                               boolean ascendingOrder,
+                                               Object offset,
+                                               Integer limit) {
+        Query query = this.sql(
+
+                /* Select clauses */
+                "SELECT * FROM transaction_\n" +
+                "WHERE (? IS NULL OR description LIKE ?)\n" +
+                "AND (? IS NULL OR date_ >= ?)\n" +
+                "AND (? IS NULL OR date_ <= ?)\n" +
+                "AND (? IS NULL OR amount >= ?)\n" +
+                "AND (? IS NULL OR amount <= ?)\n" +
+                generateMembershipWhereClauses(Transaction.accountIdColumn, accountIds) +
+
+                /* Ordering & pagination clauses */
+                generateOrderingAndPaginatingClauses(orderBy, ascendingOrder),
+
+                /* Select parameters */
                 description, description,
                 startDate,   startDate,
                 endDate,     endDate,
                 lowerAmount, lowerAmount,
-                upperAmount, upperAmount
+                upperAmount, upperAmount,
+
+                /* Ordering & pagination parameters */
+                offset, limit
         );
         return query.results(Transaction.class);
     }
