@@ -147,6 +147,38 @@ public class FamilyMemberDbHelperTest {
         /* Then */
         assertResultMatchs(retreivedList, 2, 3);
     }
+
+    @Test
+    public void givenOrderingParameters_whenSearchFamilyMember() {
+
+        /* Given */
+        String orderBy = FamilyMember.memberIdColumn;
+        boolean ascendingOrder = false;
+
+        /* When */
+        List<FamilyMember> retreivedList = dbHelper
+                .searchFamilyMember(null, null, null, null, orderBy, ascendingOrder);
+
+        /* Then */
+        assertResultMatchs(retreivedList, 3, 2, 1, 0);
+    }
+
+    @Test
+    public void givenPaginationParameters_whenSearchFamilyMember() {
+
+        /* Given */
+        String orderBy = FamilyMember.birthDateColumn;
+        LocalDate offset = testList.get(1).getBirthDate();  // offset is exclusive
+        int limit = 2;
+
+        /* When */
+        List<FamilyMember> retreivedList = dbHelper.searchFamilyMember
+                (null, null, null, null,
+                 orderBy, true, offset, limit);
+
+        /* Then */
+        assertResultMatchs(retreivedList, 2, 3);  // see givenStartBod_whenSearchFamilyMember()
+    }
     //endregion
 
     /*

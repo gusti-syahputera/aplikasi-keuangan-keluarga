@@ -18,9 +18,15 @@ public class FamilyMember implements Serializable {
             "       role       INTEGER DEFAULT 0, -- Enum(ORDINARY, ACCOUNTANT, CHIEF)\n" +
             "       pass_key   TEXT    DEFAULT NULL\n" +
             ");";
-    public final static String dropTableQuery = "DROP TABLE IF EXISTS member;";
+    public final static String dropTableQuery = "DROP TABLE IF EXISTS member";
     public final static String tableName = "member";
-    public final static String whereKeyClause = "member_id=?";
+
+    public final static String memberIdColumn = "member_id";
+    public final static String fullNameColumn = "full_name";
+    public final static String birthDateColumn = "birth_date";
+    public final static String roleColumn = "role";
+    public final static String passkeyColumn = "pass_key";
+    public final static String whereKeyClause = memberIdColumn + "=?";
 
     //region Constructors
     //==========================================================================
@@ -47,12 +53,12 @@ public class FamilyMember implements Serializable {
 
     @Id
     @GeneratedValue
-    @Column(name="member_id")
+    @Column(name=memberIdColumn)
     public int getId() {
         return memberId;
     }
 
-    @Column(name="full_name")
+    @Column(name=fullNameColumn)
     public String getFullName() {
         return fullName;
     }
@@ -63,7 +69,7 @@ public class FamilyMember implements Serializable {
     }
 
     @Deprecated  // see [DATENORM]
-    @Column(name="birth_date")
+    @Column(name=birthDateColumn)
     public String getBirthDate_() {
         return birthDate.toString();
     }
@@ -74,12 +80,12 @@ public class FamilyMember implements Serializable {
     }
 
     @Enumerated  // to store the value as numeric in the database
-    @Column(name="role")
+    @Column(name=roleColumn)
     public Role getRole() {
         return role;
     }
 
-    @Column(name="pass_key")
+    @Column(name=passkeyColumn)
     public String getPassKey() {
         return passKey;
     }

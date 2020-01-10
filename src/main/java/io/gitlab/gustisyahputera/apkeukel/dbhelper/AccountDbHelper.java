@@ -4,7 +4,6 @@ import com.dieselpoint.norm.Database;
 import com.dieselpoint.norm.Query;
 import io.gitlab.gustisyahputera.apkeukel.entitymodel.Account;
 
-import java.util.Arrays;
 import java.util.List;
 
 
@@ -30,27 +29,40 @@ public class AccountDbHelper extends Database implements DbHelper {
         return query.first(Account.class);
     }
 
-    private String prepareMultipleOwnerIdsWhereStatement(int[] ownerIds) {
-        String statement = "(? IS NULL OR account_name LIKE ?)\n";
-
-        /* Generates comma separated string of the array if it's not empty */
-        if (ownerIds != null && ownerIds.length != 0) {
-            String ownerIdsList = Arrays
-                    .stream(ownerIds)
-                    .mapToObj(String::valueOf)
-                    .reduce((a, b) -> a.concat(",").concat(b))
-                    .get();
-            statement += "AND owner_id IN (#)";
-            statement = statement.replace("#", ownerIdsList);
-        }
-
-        return statement;
+    public List<Account> searchAccount(String name, int[] ownerIds) {
+        return searchAccount(name, ownerIds, Account.accountIdColumn, true);
     }
 
-    public List<Account> searchAccount(String name, int[] ownerIds) {
-        Query query = this.where(
-                prepareMultipleOwnerIdsWhereStatement(ownerIds),
-                name, name
+    /** Search Account with ordering parameters */
+    public List<Account> searchAccount(String name,
+                                       int[] ownerIds,
+                                       String orderBy,
+                                       boolean ascendingOrder) {
+        return searchAccount(name, ownerIds, orderBy, ascendingOrder, 0, Integer.MAX_VALUE);
+    }
+
+    /** Search Account with ordering and pagination parameters */
+    public List<Account> searchAccount(String name,
+                                       int[] ownerIds,
+                                       String orderBy,
+                                       boolean ascendingOrder,
+                                       Object offset,
+                                       Integer limit) {
+        Query query = this.sql(
+
+                /* Select clauses */
+                "SELECT * FROM account\n" +
+                "WHERE (? IS NULL OR account_name LIKE ?)\n" +
+                generateMembershipWhereClauses(Account.ownerIdColumn, ownerIds) +
+
+                /* Ordering & pagination clauses */
+                generateOrderingAndPaginatingClauses(orderBy, ascendingOrder),
+
+                /* Select parameters */
+                name, name,
+
+                /* Ordering & pagination parameters */
+                offset, limit
         );
         return query.results(Account.class);
     }

@@ -29,8 +29,8 @@ public class AccountDbHelperTest {
         testList = new ArrayList<>();
         testList.add(new Account("Family income", 1));
         testList.add(new Account("Family saving", 2));
-        testList.add(new Account("School tuition", 3));
-        testList.add(new Account("School tuition", 4));
+        testList.add(new Account("School tuition 1", 3));
+        testList.add(new Account("School tuition 2", 4));
 
         /* Insert accounts in testList into database */
         testList.forEach(dbHelper::insert);
@@ -130,6 +130,37 @@ public class AccountDbHelperTest {
 
         /* Then */
         assertResultMatchs(retreivedList, 0, 3);
+    }
+
+    @Test
+    public void givenOrderingParameters_whenSearchAccount() {
+
+        /* Given */
+        String orderBy = Account.accountIdColumn;
+        boolean ascendingOrder = false;
+
+        /* When */
+        List<Account> retreivedList = dbHelper
+                .searchAccount(null, null, orderBy, ascendingOrder);
+
+        /* Then */
+        assertResultMatchs(retreivedList, 3, 2, 1, 0);
+    }
+
+    @Test
+    public void givenPaginationParameters_whenSearchAccount() {
+
+        /* Given */
+        String orderBy = Account.accountNameColumn;
+        String offset = testList.get(1).getAccountName();  // offset is exclusive
+        int limit = 1;
+
+        /* When */
+        List<Account> retreivedList = dbHelper
+                .searchAccount(null, null, orderBy, true, offset, limit);
+
+        /* Then */
+        assertResultMatchs(retreivedList, 2);
     }
     //endregion
 

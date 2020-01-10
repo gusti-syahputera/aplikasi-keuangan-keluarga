@@ -16,9 +16,13 @@ public class Account implements Serializable {
             "       FOREIGN KEY (owner_id) REFERENCES member(member_id)\n" +
             "         ON DELETE SET NULL\n" +
             ");";
-    public final static String dropTableQuery = "DROP TABLE IF EXISTS account;";
+    public final static String dropTableQuery = "DROP TABLE IF EXISTS account";
     public final static String tableName = "account";
-    public final static String whereKeyClause = "account_id=?";
+
+    public final static String accountIdColumn = "account_id";
+    public final static String accountNameColumn = "account_name";
+    public final static String ownerIdColumn = "owner_id";
+    public final static String whereKeyClause = accountIdColumn + "=?";
 
     //region Constructors
     //==========================================================================
@@ -45,17 +49,17 @@ public class Account implements Serializable {
 
     @Id
     @GeneratedValue
-    @Column(name="account_id")
+    @Column(name=accountIdColumn)
     public int getId() {
         return this.accountId;
     }
 
-    @Column(name="account_name")
+    @Column(name=accountNameColumn)
     public String getAccountName() {
         return this.accountName;
     }
 
-    @Column(name="owner_id")
+    @Column(name=ownerIdColumn)
     public int getOwnerId() {
         return ownerId;
     }
