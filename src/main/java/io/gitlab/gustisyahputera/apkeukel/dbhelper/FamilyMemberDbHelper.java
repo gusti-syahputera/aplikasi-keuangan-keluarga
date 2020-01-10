@@ -32,16 +32,55 @@ public class FamilyMemberDbHelper extends Database implements DbHelper {
     }
 
     public List<FamilyMember> searchFamilyMember(String name,
-                                                 LocalDate startBod, LocalDate endBod,
+                                                 LocalDate startBod,
+                                                 LocalDate endBod,
                                                  Role role) {
+        return searchFamilyMember(name, startBod, endBod, role,
+                                  FamilyMember.memberIdColumn, true);
+    }
+
+    /** Search FamilyMember with ordering parameters */
+    public List<FamilyMember> searchFamilyMember(String name,
+                                                 LocalDate startBod,
+                                                 LocalDate endBod,
+                                                 Role role,
+                                                 String orderBy,
+                                                 boolean ascendingOrder) {
+        return searchFamilyMember(name, startBod, endBod, role,
+                                  orderBy, ascendingOrder, 0, Integer.MAX_VALUE);
+    }
+
+    /** Search FamilyMember with ordering and pagination parameters */
+    public List<FamilyMember> searchFamilyMember(String name,
+                                                 LocalDate startBod,
+                                                 LocalDate endBod,
+                                                 Role role,
+                                                 String orderBy,
+                                                 boolean ascendingOrder,
+                                                 Object offset,
+                                                 Integer limit) {
         Integer roleOrd = (role == null) ? null : role.ordinal();
-        Query query = this.where(
-                    "(? IS NULL OR full_name LIKE ?)\n" +
-                    "AND (? IS NULL OR birth_date >= ?)\n" +
-                    "AND (? IS NULL OR birth_date <= ?)\n" +
-                    "AND (? IS NULL OR role = ?)",
-                    name, name, startBod, startBod, endBod, endBod, roleOrd, roleOrd
-            );
+        Query query = this.sql(
+
+                /* Select clauses */
+                "SELECT * FROM member\n" +
+                "WHERE (? IS NULL OR full_name LIKE ?)\n" +
+                "AND (? IS NULL OR birth_date >= ?)\n" +
+                "AND (? IS NULL OR birth_date <= ?)\n" +
+                "AND (? IS NULL OR role = ?)\n" +
+
+                /* Ordering & pagination clauses */
+                generateOrderingAndPaginatingClauses(orderBy, ascendingOrder),
+
+                /* Select parameters */
+                name, name,
+                startBod, startBod,
+                endBod, endBod,
+                roleOrd, roleOrd,
+
+                /* Ordering & pagination parameters */
+                offset, limit
+        );
         return query.results(FamilyMember.class);
     }
 
