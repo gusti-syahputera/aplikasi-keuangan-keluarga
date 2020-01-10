@@ -15,12 +15,12 @@ import static org.mockito.Mockito.when;
 
 
 @RunWith(MockitoJUnitRunner.class)
-public class Md5VerifierTest {
+public class MessageDigestVerifierTest {
 
-    @Mock MessageDigest mockMd5;
+    @Mock MessageDigest mockMd;
 
     @InjectMocks
-    private Md5Verifier md5verifier = new Md5Verifier();
+    private MessageDigestVerifier messageDigestVerifier = new MessageDigestVerifier();
 
     private String password = "Spam Egg";
     private String passkey = "b76c87d12d9ac7dc832d956b62886bce";  // it's the md5 digest of password
@@ -35,8 +35,8 @@ public class Md5VerifierTest {
 
     @Before
     public void mockSetUp() {
-        when(mockMd5.digest(password.getBytes())).thenReturn(passworddDigest);
-        when(mockMd5.digest(wrongPassword.getBytes())).thenReturn(wrongPassworddDigest);
+        when(mockMd.digest(password.getBytes())).thenReturn(passworddDigest);
+        when(mockMd.digest(wrongPassword.getBytes())).thenReturn(wrongPassworddDigest);
     }
     //endregion
 
@@ -48,8 +48,8 @@ public class Md5VerifierTest {
     public void whenDeriveKey() {
 
         /* When */
-        String retreivedKey = md5verifier.deriveKey(password);
-        verify(mockMd5).digest(password.getBytes());
+        String retreivedKey = messageDigestVerifier.deriveKey(password);
+        verify(mockMd).digest(password.getBytes());
 
         /* Then */
         Assert.assertEquals(passkey, retreivedKey);
@@ -59,8 +59,8 @@ public class Md5VerifierTest {
     public void givenRightPassword_whenVerify_thenTrue() {
 
         /* When */
-        boolean verified = md5verifier.verifyKey(passkey, password);
-        verify(mockMd5).digest(password.getBytes());
+        boolean verified = messageDigestVerifier.verifyKey(passkey, password);
+        verify(mockMd).digest(password.getBytes());
 
         /* Then */
         Assert.assertTrue(verified);
@@ -70,8 +70,8 @@ public class Md5VerifierTest {
     public void givenWrongPassword_whenVerify_thenFalse() {
 
         /* When */
-        boolean verified = md5verifier.verifyKey(passkey, wrongPassword);
-        verify(mockMd5).digest(wrongPassword.getBytes());
+        boolean verified = messageDigestVerifier.verifyKey(passkey, wrongPassword);
+        verify(mockMd).digest(wrongPassword.getBytes());
 
         /* Then */
         Assert.assertFalse(verified);

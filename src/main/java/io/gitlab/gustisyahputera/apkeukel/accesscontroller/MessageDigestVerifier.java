@@ -6,9 +6,9 @@ import java.security.MessageDigest;
 import java.util.stream.IntStream;
 
 
-public class Md5Verifier implements Verifier {
+public class MessageDigestVerifier implements Verifier {
 
-    @Inject MessageDigest md5;
+    @Inject MessageDigest md;
 
     public boolean verifyKey(String passkey, String password) {
         String derivedKey = deriveKey(password);
@@ -17,10 +17,10 @@ public class Md5Verifier implements Verifier {
 
     public String deriveKey(String password) {
 
-        /* Get digest */
-        byte[] digest = md5.digest(password.getBytes());
+        /* Get digest of password */
+        byte[] digest = md.digest(password.getBytes());
 
-        /* Encode digest bytes to hex string */
+        /* Encode digest bytes as hex string */
         return IntStream
                 .range(0, digest.length)
                 .mapToObj(i -> String.format("%02x", digest[i]))
