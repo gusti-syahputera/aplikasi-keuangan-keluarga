@@ -19,9 +19,15 @@ public class Transaction implements Serializable {
             "       FOREIGN KEY (account_id) REFERENCES account(account_id)\n" +
             "         ON DELETE CASCADE\n" +
             ");";
-    public final static String dropTableQuery = "DROP TABLE IF EXISTS transaction_;";
+    public final static String dropTableQuery = "DROP TABLE IF EXISTS transaction_";
     public final static String tableName = "transaction_";
-    public final static String whereKeyClause = "tx_id=?";
+
+    public final static String transactionIdColumn = "tx_id";
+    public final static String accountIdColumn = "account_id";
+    public final static String dateColumn = "date_";
+    public final static String amountColumn = "amount";
+    public final static String descriptionColumn = "description";
+    public final static String whereKeyClause = transactionIdColumn + "=?";
 
     //region Constructors
     //==========================================================================
@@ -54,23 +60,23 @@ public class Transaction implements Serializable {
 
     @Id
     @GeneratedValue
-    @Column(name="tx_id")
+    @Column(name=transactionIdColumn)
     public int getId() {
         return this.transactionId;
     }
 
-    @Column(name="account_id")
+    @Column(name=accountIdColumn)
     public int getAccountId() {
         return this.accountId;
     }
 
-    @Column(name="amount")
+    @Column(name=amountColumn)
     public double getAmount() {
         return this.amount;
     }
 
     @Deprecated  // see [DATENORM]
-    @Column(name="date_")
+    @Column(name=dateColumn)
     public String getDate_() {
         return this.date.toString();
     }
@@ -80,7 +86,7 @@ public class Transaction implements Serializable {
         return this.date;
     }
 
-    @Column(name="description")
+    @Column(name=descriptionColumn)
     public String getDescription() {
         return this.description;
     }
