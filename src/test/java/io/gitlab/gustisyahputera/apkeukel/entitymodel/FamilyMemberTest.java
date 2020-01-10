@@ -1,26 +1,12 @@
 package io.gitlab.gustisyahputera.apkeukel.entitymodel;
 
-import de.rtner.security.auth.spi.SimplePBKDF2;
 import org.junit.*;
-import org.junit.runner.RunWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
 
 import java.time.LocalDate;
 import java.time.Period;
 
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Mockito.*;
 
-
-@RunWith(MockitoJUnitRunner.class)
 public class FamilyMemberTest {
-
-    @Mock private SimplePBKDF2 pbkdf2;
-
-    @InjectMocks
-    private FamilyMember injectedFamilyMember = new FamilyMember();
 
     private FamilyMember testFamilyMember;
 
@@ -30,8 +16,6 @@ public class FamilyMemberTest {
 
     @Before
     public void setUp() {
-        when(pbkdf2.deriveKeyFormatted(anyString())).thenReturn("");
-
         /* Prepare test instance. Note that this process depend on
          * the result of whenCreateWithParameterConstructor() */
         String fullName = "Foo Bar";
@@ -88,19 +72,6 @@ public class FamilyMemberTest {
         Assert.assertEquals(birthDate, testFamilyMember.getBirthDate());
         Assert.assertEquals(role, testFamilyMember.getRole());
         Assert.assertEquals(passkey, testFamilyMember.getPassKey());
-    }
-
-    @Test
-    public void whenSetPassword() {
-
-        /* Given */
-        String password = "Spam Egg";
-
-        /* When */
-        injectedFamilyMember.setPassword(password);
-
-        /* Then */
-        verify(pbkdf2).deriveKeyFormatted(password);
     }
     //endregion
 

@@ -1,8 +1,5 @@
 package io.gitlab.gustisyahputera.apkeukel.entitymodel;
 
-import com.google.inject.Inject;
-import de.rtner.security.auth.spi.SimplePBKDF2;
-
 import javax.persistence.*;
 import java.io.Serializable;
 import java.time.LocalDate;
@@ -41,8 +38,6 @@ public class FamilyMember implements Serializable {
 
     //region Properties
     //==========================================================================
-
-    @Inject private SimplePBKDF2 pbkdf2;
 
     private int memberId;
     private String fullName;
@@ -112,11 +107,6 @@ public class FamilyMember implements Serializable {
 
     public void setPassKey(String passKey) {
         this.passKey = passKey;
-    }
-
-    @Transient
-    public void setPassword(String password) {
-        this.passKey = pbkdf2.deriveKeyFormatted(password);
     }
 
     /*
