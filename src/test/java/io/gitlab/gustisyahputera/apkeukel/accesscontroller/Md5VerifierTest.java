@@ -22,12 +22,12 @@ public class Md5VerifierTest {
     @InjectMocks
     private Md5Verifier md5verifier = new Md5Verifier();
 
-    String password = "Spam Egg";
-    String passkey = "b76c87d12d9ac7dc832d956b62886bce";  // it's the md5 digest of password
-    byte[] passworddDigest = {-73, 108, -121, -47, 45, -102, -57, -36, -125, 45, -107, 107, 98, -120, 107, -50};
+    private String password = "Spam Egg";
+    private String passkey = "b76c87d12d9ac7dc832d956b62886bce";  // it's the md5 digest of password
+    private byte[] passworddDigest = {-73, 108, -121, -47, 45, -102, -57, -36, -125, 45, -107, 107, 98, -120, 107, -50};
 
-    String wrongPassword = "Foo Bar";
-    byte[] wrongPassworddDigest = {9, 73, 40, -56, 14, -113, -19, 103, 60, -18, -55, 119, -31, 112, -26, 75};
+    private String wrongPassword = "Foo Bar";
+    private byte[] wrongPassworddDigest = {9, 73, 40, -56, 14, -113, -19, 103, 60, -18, -55, 119, -31, 112, -26, 75};
 
 
     //region Setups
