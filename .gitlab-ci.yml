@@ -28,7 +28,7 @@ test:
   stage: test
   script:
     - gradle test
-    - ./gradlew build jacocoTestReport
+    - gradle build jacocoTestReport
     - cat build/reports/jacoco/test/html/index.html | grep -o '<tfoot>.*</tfoot>'
   cache:
     key: "$CI_COMMIT_REF_NAME"
@@ -40,12 +40,19 @@ test:
 deploy:
   stage: deploy
   script:
-    - export SHADOWJAR_VERSION=$CI_COMMIT_REF_NAME
-    - ./gradlew build shadowJar
+    - export APKEUKEL_VERSION=$CI_COMMIT_REF_NAME
+    - gradle build jar
+    - gradle build shadowJar  # uber jar
 # remove these comments after the job is already
 #   only:
 #     - tags
 #     - web
+  cache:
+    key: "$CI_COMMIT_REF_NAME"
+    policy: pull
+    paths:
+      - build
+      - .gradle
   artifacts:
      name: "apkeukel-core-$CI_COMMIT_REF_NAME"
      paths:

@@ -31,7 +31,14 @@ dependencies {
 
 apply plugin: 'jacoco'
 
+jar {
+    archiveBaseName = 'apkeukel-core'
+    archiveVersion = System.getenv('APKEUKEL_VERSION')
+    archiveClassifier = ''
+}
+
 shadowJar {
     archiveBaseName = 'apkeukel-core'
-    archiveVersion = System.getenv('SHADOWJAR_VERSION')
+    archiveVersion = System.getenv('APKEUKEL_VERSION')
+    archiveClassifier = 'uber'
 }
