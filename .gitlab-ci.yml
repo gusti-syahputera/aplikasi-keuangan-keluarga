@@ -36,4 +36,17 @@ test:
     paths:
       - build
       - .gradle
-    
+
+deploy:
+  stage: deploy
+  script:
+    - export SHADOWJAR_VERSION=$CI_COMMIT_REF_NAME
+    - ./gradlew build shadowJar
+# remove these comments after the job is already
+#   only:
+#     - tags
+#     - web
+  artifacts:
+     name: "$CI_COMMIT_REF_NAME"
+     paths:
+       - build/libs/*.jar
