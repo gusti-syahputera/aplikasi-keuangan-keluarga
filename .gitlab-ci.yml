@@ -43,10 +43,9 @@ deploy:
     - export APKEUKEL_VERSION=$CI_COMMIT_REF_NAME
     - gradle build jar
     - gradle build shadowJar  # uber jar
-# remove these comments after the job is already
-#   only:
-#     - tags
-#     - web
+  only:
+    - tags
+    - web
   cache:
     key: "$CI_COMMIT_REF_NAME"
     policy: pull
