@@ -1,8 +1,9 @@
 plugins {
     id 'java'
+    id 'com.github.johnrengelman.shadow' version '5.2.0'
 }
 
-version '0.1'
+version '1.0.0b'
 
 sourceCompatibility = 1.8
 
@@ -29,3 +30,8 @@ dependencies {
 }
 
 apply plugin: 'jacoco'
+
+shadowJar {
+    archiveBaseName = 'apkeukel-core'
+    archiveVersion = System.getenv('SHADOWJAR_VERSION')
+}
