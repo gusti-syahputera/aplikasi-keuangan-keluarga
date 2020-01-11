@@ -37,8 +37,8 @@ test:
       - build
       - .gradle
 
-compile:
-  stage: compile
+deploy:
+  stage: deploy
   script:
     - export SHADOWJAR_VERSION=$CI_COMMIT_REF_NAME
     - ./gradlew build shadowJar
