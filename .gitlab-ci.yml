@@ -37,8 +37,8 @@ test:
       - build
       - .gradle
 
-deploy:
-  stage: deploy
+compile:
+  stage: compile
   script:
     - export SHADOWJAR_VERSION=$CI_COMMIT_REF_NAME
     - ./gradlew build shadowJar
@@ -47,6 +47,6 @@ deploy:
 #     - tags
 #     - web
   artifacts:
-     name: "$CI_COMMIT_REF_NAME"
+     name: "apkeukel-core-$CI_COMMIT_REF_NAME"
      paths:
-       - build/libs/*.jar
+       - build/libs/apkeukel-core-*.jar
